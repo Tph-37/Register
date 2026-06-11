@@ -585,11 +585,21 @@ function scanFrame(){
   if(code){
     try{
       var raw=code.data.trim();
+      // Add missing curly braces (QR codes generated without them)
       if(raw.charAt(0)!=='{')raw='{'+raw;
       if(raw.charAt(raw.length-1)!=='}')raw=raw+'}';
       var d=JSON.parse(raw);
       if(d.id)handleScan(d.id,d);
-    }catch(e){}
+    }catch(e){
+      // Fallback: extract fields directly with regex
+      try{
+        var raw2=code.data;
+        var mid=raw2.match(/"id"\s*:\s*"([^"]+)"/);
+        var mn=raw2.match(/"n"\s*:\s*"([^"]+)"/);
+        var mc=raw2.match(/"c"\s*:\s*"([^"]+)"/);
+        if(mid){handleScan(mid[1],{id:mid[1],n:mn?mn[1]:'',c:mc?mc[1]:''});}
+      }catch(e2){}
+    }
   }
   requestAnimationFrame(scanFrame);
 }
