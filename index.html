@@ -584,14 +584,15 @@ function scanFrame(){
   var code=jsQR(img.data,img.width,img.height,{inversionAttempts:'attemptBoth'});
   if(code){
     try{
-      var raw=code.data.trim();
-      // Add missing curly braces (QR codes generated without them)
+      // Strip ALL whitespace characters including tabs from start and end
+      var raw=code.data.replace(/^[\s\t\n\r]+|[\s\t\n\r]+$/g,'');
+      // Add missing curly braces
       if(raw.charAt(0)!=='{')raw='{'+raw;
       if(raw.charAt(raw.length-1)!=='}')raw=raw+'}';
       var d=JSON.parse(raw);
       if(d.id)handleScan(d.id,d);
     }catch(e){
-      // Fallback: extract fields directly with regex
+      // Fallback: extract fields directly with regex - works regardless of format
       try{
         var raw2=code.data;
         var mid=raw2.match(/"id"\s*:\s*"([^"]+)"/);
