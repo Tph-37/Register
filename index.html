@@ -515,32 +515,73 @@ function startCam(){
     document.getElementById('cam-note').textContent='Camera not supported. Try opening in Chrome.';
     return;
   }
-  navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}})
+  // Galaxy A13 and similar Samsung devices need focusMode set explicitly
+  var constraints={
+    video:{
+      facingMode:{ideal:'environment'},
+      width:{ideal:1280},
+      height:{ideal:720},
+      focusMode:{ideal:'continuous'},
+      advanced:[{focusMode:'continuous'}]
+    }
+  };
+  navigator.mediaDevices.getUserMedia(constraints)
   .then(function(stream){
     var v=document.getElementById('qr-video');
-    v.srcObject=stream;v.play();
+    v.srcObject=stream;
+    v.play();
+    // Apply continuous autofocus via track settings if supported
+    var track=stream.getVideoTracks()[0];
+    if(track&&track.applyConstraints){
+      track.applyConstraints({advanced:[{focusMode:'continuous'}]}).catch(function(){});
+    }
     document.getElementById('cam-btn').style.display='none';
     document.getElementById('cam-note').textContent='Ready — point at a QR card.';
-    camOn=true;requestAnimationFrame(scanFrame);
+    camOn=true;
+    scanCanvas=document.createElement('canvas');
+    requestAnimationFrame(scanFrame);
   })
   .catch(function(err){
     if(err.name==='NotAllowedError'||err.name==='PermissionDeniedError'){
       document.getElementById('perm-box').style.display='block';
       document.getElementById('cam-note').textContent='Camera permission denied — see below.';
     } else {
-      document.getElementById('cam-note').textContent='Camera error: '+err.message;
+      // Retry with simpler constraints if advanced ones fail
+      navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}}})
+      .then(function(stream){
+        var v=document.getElementById('qr-video');
+        v.srcObject=stream;v.play();
+        document.getElementById('cam-btn').style.display='none';
+        document.getElementById('cam-note').textContent='Ready — point at a QR card.';
+        camOn=true;
+        scanCanvas=document.createElement('canvas');
+        requestAnimationFrame(scanFrame);
+      })
+      .catch(function(err2){
+        document.getElementById('cam-note').textContent='Camera error: '+err2.message;
+      });
     }
   });
 }
+
+var scanCanvas=null;
+var lastScanTime=0;
 
 function scanFrame(){
   if(!camOn)return;
   var v=document.getElementById('qr-video');
   if(v.readyState!==v.HAVE_ENOUGH_DATA){requestAnimationFrame(scanFrame);return;}
-  var cv=document.createElement('canvas');cv.width=v.videoWidth;cv.height=v.videoHeight;
-  cv.getContext('2d').drawImage(v,0,0);
-  var img=cv.getContext('2d').getImageData(0,0,cv.width,cv.height);
-  var code=jsQR(img.data,img.width,img.height,{inversionAttempts:'dontInvert'});
+  // Throttle to 10 scans/sec — gives camera time to focus between frames
+  var now=Date.now();
+  if(now-lastScanTime<100){requestAnimationFrame(scanFrame);return;}
+  lastScanTime=now;
+  if(!scanCanvas){scanCanvas=document.createElement('canvas');}
+  scanCanvas.width=v.videoWidth;
+  scanCanvas.height=v.videoHeight;
+  var ctx=scanCanvas.getContext('2d');
+  ctx.drawImage(v,0,0);
+  var img=ctx.getImageData(0,0,scanCanvas.width,scanCanvas.height);
+  var code=jsQR(img.data,img.width,img.height,{inversionAttempts:'attemptBoth'});
   if(code){
     try{
       var raw=code.data.trim();
