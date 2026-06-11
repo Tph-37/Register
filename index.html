@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#1a6b4a">
 <title>Pre-Prep Register</title>
 <link rel="manifest" href="./manifest.json">
-<script src="https://unpkg.com/@zxing/library@0.19.1/umd/index.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f3f4f6;color:#111827;min-height:100vh;}
@@ -515,74 +515,119 @@ function setMode(m,btn){
   document.getElementById('scan-lbl').textContent=MODE_LABELS[m]||m;
 }
 
-var codeReader=null;
-
 function startCam(){
   document.getElementById('perm-box').style.display='none';
-  if(!window.ZXing){
-    document.getElementById('cam-note').textContent='Scanner library not loaded. Check your connection and reload.';
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+    document.getElementById('cam-note').textContent='Camera not supported. Try opening in Chrome.';
     return;
   }
-  try{
-    codeReader=new ZXing.BrowserMultiFormatReader();
+  // Galaxy A13 and similar Samsung devices need focusMode set explicitly
+  var constraints={
+    video:{
+      facingMode:{ideal:'environment'},
+      width:{ideal:1280},
+      height:{ideal:720},
+      focusMode:{ideal:'continuous'},
+      advanced:[{focusMode:'continuous'}]
+    }
+  };
+  navigator.mediaDevices.getUserMedia(constraints)
+  .then(function(stream){
+    var v=document.getElementById('qr-video');
+    v.srcObject=stream;
+    v.play();
+    // Apply continuous autofocus via track settings if supported
+    var track=stream.getVideoTracks()[0];
+    if(track&&track.applyConstraints){
+      track.applyConstraints({advanced:[{focusMode:'continuous'}]}).catch(function(){});
+    }
     document.getElementById('cam-btn').style.display='none';
     document.getElementById('cam-note').textContent='Ready — point at a QR card.';
     camOn=true;
-    codeReader.decodeFromVideoDevice(null,'qr-video',function(result,err){
-      if(result){
-        handleQRResult(result.getText());
-      }
-      if(err&&!(err instanceof ZXing.NotFoundException)){
-        console.log('Scan error:',err);
-      }
-    });
-  }catch(e){
-    document.getElementById('cam-note').textContent='Camera error: '+e.message;
-    document.getElementById('perm-box').style.display='block';
-  }
+    scanCanvas=document.createElement('canvas');
+    requestAnimationFrame(scanFrame);
+  })
+  .catch(function(err){
+    if(err.name==='NotAllowedError'||err.name==='PermissionDeniedError'){
+      document.getElementById('perm-box').style.display='block';
+      document.getElementById('cam-note').textContent='Camera permission denied — see below.';
+    } else {
+      // Retry with simpler constraints if advanced ones fail
+      navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}}})
+      .then(function(stream){
+        var v=document.getElementById('qr-video');
+        v.srcObject=stream;v.play();
+        document.getElementById('cam-btn').style.display='none';
+        document.getElementById('cam-note').textContent='Ready — point at a QR card.';
+        camOn=true;
+        scanCanvas=document.createElement('canvas');
+        requestAnimationFrame(scanFrame);
+      })
+      .catch(function(err2){
+        document.getElementById('cam-note').textContent='Camera error: '+err2.message;
+      });
+    }
+  });
 }
 
-function handleQRResult(text){
+var scanCanvas=null;
+var lastScanTime=0;
+
+function scanFrame(){
+  if(!camOn)return;
+  var v=document.getElementById('qr-video');
+  if(v.readyState!==v.HAVE_ENOUGH_DATA){requestAnimationFrame(scanFrame);return;}
+  // Throttle to 10 scans/sec — gives camera time to focus between frames
+  var now=Date.now();
+  if(now-lastScanTime<100){requestAnimationFrame(scanFrame);return;}
+  lastScanTime=now;
+  if(!scanCanvas){scanCanvas=document.createElement('canvas');}
+  scanCanvas.width=v.videoWidth;
+  scanCanvas.height=v.videoHeight;
+  var ctx=scanCanvas.getContext('2d');
+  ctx.drawImage(v,0,0);
+  var img=ctx.getImageData(0,0,scanCanvas.width,scanCanvas.height);
+  var code=jsQR(img.data,img.width,img.height,{inversionAttempts:'attemptBoth'});
   if(code){
-  // Show in debug box
-  var debugRaw=document.getElementById('debug-raw');
-  var debugParsed=document.getElementById('debug-parsed');
-  if(debugRaw)debugRaw.textContent='RAW: '+JSON.stringify(text);
-
-  // Strip all whitespace including tabs
-  var raw=text.replace(/^[\s	
-
-	
-
- ]+|[\s	
-
-	
-
- ]+$/g,'');
-  // Add missing curly braces
-  if(raw.charAt(0)!=='{')raw='{'+raw;
-  if(raw.charAt(raw.length-1)!=='}')raw=raw+'}';
-  if(debugParsed)debugParsed.textContent='Attempting: '+raw;
-  try{
-    var d=JSON.parse(raw);
-    if(debugParsed)debugParsed.textContent='Parsed OK — id:'+d.id+' n:'+d.n;
-    if(d.id)handleScan(d.id,d);
-  }catch(e){
-    // Fallback regex extraction
     try{
-      var mid=text.match(/"id"\s*:\s*"([^"]+)"/);
-      var mn=text.match(/"n"\s*:\s*"([^"]+)"/);
-      var mc=text.match(/"c"\s*:\s*"([^"]+)"/);
-      if(mid){
-        if(debugParsed)debugParsed.textContent='Regex match — id:'+mid[1]+' n:'+(mn?mn[1]:'?');
-        handleScan(mid[1],{id:mid[1],n:mn?mn[1]:'',c:mc?mc[1]:''});
-      } else {
-        if(debugParsed)debugParsed.textContent='FAILED: '+e.message+' | raw: '+raw;
+      // Show raw data in debug box
+      var debugRaw=document.getElementById('debug-raw');
+      var debugParsed=document.getElementById('debug-parsed');
+      if(debugRaw)debugRaw.textContent='RAW: '+JSON.stringify(code.data);
+
+      // Strip ALL whitespace including tabs
+      var raw=code.data.replace(/^[\s\t\n\r\u0009\u000a\u000d\u0020]+|[\s\t\n\r\u0009\u000a\u000d\u0020]+$/g,'');
+      if(debugRaw)debugRaw.textContent+=' | STRIPPED: '+raw;
+
+      // Add missing curly braces
+      if(raw.charAt(0)!=='{')raw='{'+raw;
+      if(raw.charAt(raw.length-1)!=='}')raw=raw+'}';
+      if(debugParsed)debugParsed.textContent='Attempting parse: '+raw;
+
+      var d=JSON.parse(raw);
+      if(debugParsed)debugParsed.textContent='Parsed OK — id:'+d.id+' n:'+d.n;
+      if(d.id)handleScan(d.id,d);
+    }catch(e){
+      // Fallback: extract fields directly with regex
+      try{
+        var raw2=code.data;
+        var mid=raw2.match(/"id"\s*:\s*"([^"]+)"/);
+        var mn=raw2.match(/"n"\s*:\s*"([^"]+)"/);
+        var mc=raw2.match(/"c"\s*:\s*"([^"]+)"/);
+        var debugParsed2=document.getElementById('debug-parsed');
+        if(mid){
+          if(debugParsed2)debugParsed2.textContent='Regex match — id:'+mid[1]+' n:'+(mn?mn[1]:'?');
+          handleScan(mid[1],{id:mid[1],n:mn?mn[1]:'',c:mc?mc[1]:''});
+        } else {
+          if(debugParsed2)debugParsed2.textContent='FAILED — no id found. Error: '+e.message;
+        }
+      }catch(e2){
+        var debugParsed3=document.getElementById('debug-parsed');
+        if(debugParsed3)debugParsed3.textContent='BOTH methods failed: '+e.message+' / '+e2.message;
       }
-    }catch(e2){
-      if(debugParsed)debugParsed.textContent='BOTH failed: '+e2.message;
     }
   }
+  requestAnimationFrame(scanFrame);
 }
 
 var CLASS_NAME_MAP={'mini martlets':'mm','pre-nursery':'pn','prenursery':'pn','nursery':'nu','reception':'rc','staff':'staff','nanny':'nanny'};
