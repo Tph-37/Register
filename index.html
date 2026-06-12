@@ -222,6 +222,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
     <!-- Result display -->
     <div id="scan-result" style="display:none;width:100%;max-width:340px;padding:14px 16px;border-radius:12px;text-align:center;font-size:14px;font-weight:700;"></div>
+
+    <!-- Manual entry fallback -->
+    <div id="manual-entry-box" style="display:none;width:100%;max-width:340px;background:#fff;border:2px solid #1a6b4a;border-radius:12px;padding:14px;">
+      <div style="font-size:12px;font-weight:700;color:#1a6b4a;margin-bottom:8px;">Manual lookup</div>
+      <div style="font-size:11px;color:#6b7280;margin-bottom:10px;">Type a name to find and mark them:</div>
+      <input type="text" id="manual-input" placeholder="Start typing a name..." oninput="manualSearch(this.value)"
+        style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:9px 12px;font-size:14px;margin-bottom:8px;">
+      <div id="manual-results" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;"></div>
+    </div>
   </div>
 
   <div id="child-pane" class="reg-pane" style="display:none;">
@@ -308,7 +317,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 </div>
 
-<script src="https://unpkg.com/@zxing/library@0.19.1/umd/index.min.js"></script>
+<!-- No external scanner library needed -->
 <script>
 // ── SERVICE WORKER ─────────────────────────────────────
 if('serviceWorker' in navigator){
@@ -331,6 +340,20 @@ function doInstall(){
     document.getElementById('install-banner').style.display='none';
   });
 }
+
+// ── URL SCAN HANDLER — reads ?scan= params when opened via QR ──
+(function(){
+  var params=new URLSearchParams(window.location.search);
+  var scanId=params.get('scan');
+  var scanN=params.get('n');
+  var scanC=params.get('c');
+  if(scanId||scanN){
+    // Store pending scan — will be processed after people are loaded
+    window._pendingScan={id:scanId,n:scanN?decodeURIComponent(scanN.replace(/\+/g,' ')):'',c:scanC?decodeURIComponent(scanC.replace(/\+/g,' ')):''}; 
+    // Clean URL so it doesn't re-trigger on refresh
+    window.history.replaceState({},'',window.location.pathname);
+  }
+})();
 
 // ── CONFIG ─────────────────────────────────────────────
 var CHILD_CLASSES={
@@ -448,6 +471,12 @@ function goLive(){
     document.getElementById('setup-screen').className='screen';
     document.getElementById('main-screen').className='screen active';
     renderAll();
+    // Process any pending QR scan from URL
+    if(window._pendingScan){
+      var ps=window._pendingScan;
+      window._pendingScan=null;
+      setTimeout(function(){handleScan(ps.id,ps);},300);
+    }
   },400);
 }
 
@@ -464,6 +493,20 @@ function goEdit(){
   });
   checkStart();
 }
+
+// ── HANDLE INCOMING URL SCANS WHEN APP ALREADY OPEN ──────
+window.addEventListener('pageshow', function(){
+  var params=new URLSearchParams(window.location.search);
+  var scanId=params.get('scan');
+  var scanN=params.get('n');
+  var scanC=params.get('c');
+  if((scanId||scanN)&&people.length){
+    var n=scanN?decodeURIComponent(scanN.replace(/\+/g,' ')):'';
+    var c=scanC?decodeURIComponent(scanC.replace(/\+/g,' ')):'';
+    window.history.replaceState({},'',window.location.pathname);
+    handleScan(scanId,{id:scanId,n:n,c:c});
+  }
+});
 
 // ── TABS ───────────────────────────────────────────────
 function showTab(t){
@@ -499,59 +542,62 @@ function setMode(m,btn){
   document.getElementById('scan-result').style.display='none';
 }
 
-// ── NATIVE QR SCAN — processes photo taken by phone camera ──
+// ── NATIVE QR SCAN — uses browser BarcodeDetector API ──
 function processQRImage(input){
   if(!input.files||!input.files[0])return;
   var file=input.files[0];
-  var reader=new FileReader();
-  reader.onload=function(e){
-    var img=new Image();
-    img.onload=function(){
-      var canvas=document.createElement('canvas');
-      canvas.width=img.width;
-      canvas.height=img.height;
-      var ctx=canvas.getContext('2d');
-      ctx.drawImage(img,0,0);
-      var imageData=ctx.getImageData(0,0,canvas.width,canvas.height);
-      // Try ZXing first
-      decodeWithZXing(canvas,img,imageData);
-    };
-    img.src=e.target.result;
+  var img=new Image();
+  var url=URL.createObjectURL(file);
+  img.onload=function(){
+    if('BarcodeDetector' in window){
+      // Use native browser BarcodeDetector — works on Android Chrome 83+
+      var detector=new BarcodeDetector({formats:['qr_code']});
+      detector.detect(img).then(function(barcodes){
+        URL.revokeObjectURL(url);
+        if(barcodes&&barcodes.length>0){
+          handleQRText(barcodes[0].rawValue);
+        } else {
+          // Try canvas approach as fallback
+          tryCanvasDecode(img);
+        }
+      }).catch(function(){
+        tryCanvasDecode(img);
+      });
+    } else {
+      tryCanvasDecode(img);
+    }
+    setTimeout(function(){input.value='';},500);
   };
-  reader.readAsDataURL(file);
-  // Reset input so same card can be scanned again
-  setTimeout(function(){input.value='';},1000);
+  img.src=url;
 }
 
-function decodeWithZXing(canvas,img,imageData){
-  try{
-    var hints=new Map();
-    hints.set(ZXing.DecodeHintType.TRY_HARDER,true);
-    var reader=new ZXing.MultiFormatReader();
-    reader.setHints(hints);
-    var lum=new ZXing.RGBLuminanceSource(imageData.data,canvas.width,canvas.height);
-    var bmp=new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(lum));
-    var result=reader.decode(bmp);
-    handleQRText(result.getText());
-  }catch(e){
-    // ZXing failed — try with inverted image
-    try{
-      var ctx2=canvas.getContext('2d');
-      var inv=ctx2.getImageData(0,0,canvas.width,canvas.height);
-      for(var i=0;i<inv.data.length;i+=4){
-        inv.data[i]=255-inv.data[i];
-        inv.data[i+1]=255-inv.data[i+1];
-        inv.data[i+2]=255-inv.data[i+2];
+function tryCanvasDecode(img){
+  // Use BarcodeDetector on canvas element — sometimes works when image doesn't
+  var canvas=document.createElement('canvas');
+  canvas.width=img.naturalWidth||img.width;
+  canvas.height=img.naturalHeight||img.height;
+  var ctx=canvas.getContext('2d');
+  ctx.drawImage(img,0,0);
+  if('BarcodeDetector' in window){
+    var detector=new BarcodeDetector({formats:['qr_code']});
+    detector.detect(canvas).then(function(barcodes){
+      if(barcodes&&barcodes.length>0){
+        handleQRText(barcodes[0].rawValue);
+      } else {
+        showManualEntry();
       }
-      var lum2=new ZXing.RGBLuminanceSource(inv.data,canvas.width,canvas.height);
-      var bmp2=new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(lum2));
-      var reader2=new ZXing.MultiFormatReader();
-      var result2=reader2.decode(bmp2);
-      handleQRText(result2.getText());
-    }catch(e2){
-      showScanResult('Could not read QR code — try again','#dc2626','#fee2e2');
-    }
+    }).catch(function(){
+      showManualEntry();
+    });
+  } else {
+    showManualEntry();
   }
+}
+
+function showManualEntry(){
+  document.getElementById('manual-entry-box').style.display='block';
+  document.getElementById('manual-input').focus();
+  showScanResult('Auto-read failed — use manual entry below','#d97706','#fef3c7');
 }
 
 function handleQRText(text){
@@ -580,6 +626,36 @@ function showScanResult(msg,color,bg){
   el.style.border='1.5px solid '+color;
   el.style.display='block';
   setTimeout(function(){el.style.display='none';},3000);
+}
+
+// ── MANUAL SEARCH ─────────────────────────────────────
+function manualSearch(query){
+  var res=document.getElementById('manual-results');
+  if(!query||query.length<2){res.innerHTML='';return;}
+  var q=query.toLowerCase();
+  var matches=people.filter(function(p){return p.name.toLowerCase().indexOf(q)>-1;});
+  if(!matches.length){res.innerHTML='<div style="font-size:12px;color:#9ca3af;padding:8px;">No matches</div>';return;}
+  res.innerHTML=matches.slice(0,5).map(function(p){
+    var r=records[p.id];
+    var clsName=p.type==='child'&&CHILD_CLASSES[p.cls]?CHILD_CLASSES[p.cls].name:p.type;
+    return'<div onclick="manualMarkBySearch(''+p.id+'')" style="padding:10px 12px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;cursor:pointer;">'+
+      '<div style="font-size:13px;font-weight:700;">'+p.name+'</div>'+
+      '<div style="font-size:11px;color:#6b7280;">'+clsName+' · '+(SL[r.status]||r.status)+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+function manualMarkBySearch(id){
+  document.getElementById('manual-input').value='';
+  document.getElementById('manual-results').innerHTML='';
+  document.getElementById('manual-entry-box').style.display='none';
+  var p=people.find(function(x){return x.id===id;});if(!p)return;
+  var status;
+  if(scanMode==='in')status=p.type==='child'?(minNow()>CUTOFF?'late':'present'):'in';
+  else if(scanMode==='out')status=p.type==='child'?'signed-out':'out';
+  else status=scanMode;
+  mark(p.id,status,true);
+  showScanResult('✓ '+p.name+' — '+(SV[status]||status),MODE_COLORS[scanMode]||'#1a6b4a',MODE_BG[scanMode]||'#e8f5f0');
 }
 
 // ── HANDLE SCAN ────────────────────────────────────────
