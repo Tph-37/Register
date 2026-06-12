@@ -363,7 +363,16 @@ var CHILD_CLASSES={
   rc:{name:'Reception',color:'#1a6b4a'}
 };
 var CUTOFF=8*60+15;
-var STORAGE_KEY='preprep_register_v4';
+var STORAGE_KEY='preprep_register_v3';
+// Migrate from any older key
+(function(){
+  var keys=['preprep_register_v4','preprep_register_v2','preprep_register_v1'];
+  keys.forEach(function(k){
+    if(!localStorage.getItem(STORAGE_KEY)&&localStorage.getItem(k)){
+      localStorage.setItem(STORAGE_KEY,localStorage.getItem(k));
+    }
+  });
+})();
 
 // ── STATE ──────────────────────────────────────────────
 var people=[];
