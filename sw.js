@@ -1,4 +1,4 @@
-const CACHE_NAME = 'preprep-register-v3';
+const CACHE_NAME = 'preprep-register-v5';
 const urlsToCache = [
   './index.html',
   './manifest.json',
