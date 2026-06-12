@@ -10,7 +10,6 @@
 <meta name="theme-color" content="#1a6b4a">
 <title>Pre-Prep Register</title>
 <link rel="manifest" href="./manifest.json">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f3f4f6;color:#111827;min-height:100vh;}
@@ -54,23 +53,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .tabs::-webkit-scrollbar{display:none;}
 .tab{flex:1;padding:11px 4px;text-align:center;font-size:11px;font-weight:600;color:#6b7280;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;min-width:60px;}
 .tab.on{color:#1a6b4a;border-bottom-color:#1a6b4a;}
-#scan-pane{padding:14px;display:flex;flex-direction:column;align-items:center;gap:12px;}
 .mode-row{display:flex;gap:6px;width:100%;max-width:380px;flex-wrap:wrap;}
 .mode-btn{flex:1;min-width:70px;padding:8px 4px;border:1.5px solid #e5e7eb;background:#fff;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;color:#6b7280;text-align:center;line-height:1.4;}
 .mode-btn.on{border-color:#1a6b4a;background:#e8f5f0;color:#1a6b4a;}
 .mode-btn.on-home{border-color:#ea580c;background:#fff7ed;color:#ea580c;}
 .mode-btn.on-site{border-color:#7c3aed;background:#f5f3ff;color:#7c3aed;}
 .mode-btn.on-out{border-color:#1d4ed8;background:#dbeafe;color:#1d4ed8;}
-.cam-wrap{width:100%;max-width:300px;aspect-ratio:1;border:3px solid #1a6b4a;border-radius:12px;overflow:hidden;background:#000;position:relative;}
-.cam-wrap.c-out{border-color:#1d4ed8;}.cam-wrap.c-home{border-color:#ea580c;}.cam-wrap.c-onsite{border-color:#7c3aed;}
-#qr-video{width:100%;height:100%;object-fit:cover;display:block;}
-.scan-line{position:absolute;left:10px;right:10px;height:2px;animation:sl 2s ease-in-out infinite;}
-@keyframes sl{0%,100%{top:15%;}50%{top:85%;}}
-.scan-lbl{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.55);color:#fff;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;white-space:nowrap;}
-.cam-start-btn{width:100%;max-width:300px;padding:13px;background:#1a6b4a;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;}
+.scan-trigger-btn{width:100%;max-width:300px;padding:18px;background:#1a6b4a;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:.02em;}
 .scan-note{font-size:12px;color:#6b7280;text-align:center;max-width:280px;line-height:1.5;}
-.perm-box{background:#fff3cd;border:1px solid #ffc107;border-radius:10px;padding:12px 14px;max-width:300px;width:100%;font-size:12px;line-height:1.6;color:#856404;display:none;}
-.perm-box strong{display:block;margin-bottom:4px;font-size:13px;}
 .reg-pane{display:flex;flex-direction:column;}
 .summary{display:grid;gap:4px;padding:10px 12px;background:#fff;border-bottom:1px solid #e5e7eb;}
 .summary.s5{grid-template-columns:repeat(5,1fr);}
@@ -98,7 +88,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .stag.late{background:#fef3c7;color:#d97706;}.stag.signed-out{background:#dbeafe;color:#1d4ed8;}
 .stag.leaving-home{background:#fff7ed;color:#ea580c;}.stag.onsite{background:#f5f3ff;color:#7c3aed;}
 .stag.in{background:#e8f5f0;color:#1a6b4a;}.stag.out{background:#f3f4f6;color:#6b7280;}
-#log-pane{padding:10px 16px 90px;display:flex;flex-direction:column;gap:7px;}
 .le{background:#fff;border-radius:10px;border:1px solid #e5e7eb;padding:9px 13px;display:flex;gap:9px;}
 .ldot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;}
 .ldot.present,.ldot.late,.ldot.in{background:#1a6b4a;}
@@ -137,7 +126,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <body>
 <div class="toast" id="toast"></div>
 <div id="install-banner" style="display:none;">
-  <p><strong>📲 Install as App</strong>Tap Install for camera access &amp; offline use</p>
+  <p><strong>📲 Install as App</strong>Tap Install for offline use</p>
   <button class="install-btn" id="install-btn" onclick="doInstall()">Install</button>
   <button class="dismiss-btn" onclick="document.getElementById('install-banner').style.display='none'">×</button>
 </div>
@@ -155,7 +144,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     </div>
     <div class="first-time-notice" id="first-time-notice" style="display:none;">
       <h3>First time setup</h3>
-      <p>Add all your students, staff and nannies below then tap <strong>Start Register</strong>. Your names will be saved to this phone and will be here every time you open the app.</p>
+      <p>Add all your students, staff and nannies below then tap <strong>Start Register</strong>. Your names will be saved to this phone.</p>
     </div>
     <div class="cls-card">
       <div class="cls-top"><div class="cls-dot" style="background:#7c3aed;"></div><div class="cls-title">Mini Martlets</div><div class="cls-n" id="cnt-mm">0</div></div>
@@ -207,33 +196,34 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="tab" id="tab-nanny" onclick="showTab('nanny')">Nannies</div>
     <div class="tab" id="tab-log" onclick="showTab('log')">Log</div>
   </div>
-  <div id="scan-pane">
-    <div style="padding:14px;display:flex;flex-direction:column;align-items:center;gap:12px;">
-      <div class="mode-row">
-        <button class="mode-btn on" onclick="setMode('in',this)">Sign in</button>
-        <button class="mode-btn" onclick="setMode('out',this)">Left school</button>
-        <button class="mode-btn" onclick="setMode('leaving-home',this)">🏠 Home<br>on site</button>
-        <button class="mode-btn" onclick="setMode('onsite',this)">🏫 Back<br>on site</button>
-      </div>
-      <div class="cam-wrap" id="cam-wrap">
-        <video id="qr-video" playsinline muted autoplay></video>
-        <div class="scan-line" id="scan-line" style="background:#1a6b4a;"></div>
-        <div class="scan-lbl" id="scan-lbl">Sign in</div>
-      </div>
-      <button class="cam-start-btn" id="cam-btn" onclick="startCam()">📷 Start Camera</button>
-      <p class="scan-note" id="cam-note">Tap <strong>Start Camera</strong> then point at a QR card.</p>
-      <div id="debug-box" style="display:none;background:#1e1e1e;color:#00ff00;font-family:monospace;font-size:11px;padding:10px;border-radius:8px;width:100%;max-width:300px;word-break:break-all;line-height:1.6;">
-        <div style="color:#9ca3af;margin-bottom:4px;">DEBUG — last QR scan:</div>
-        <div id="debug-raw" style="color:#fff;margin-bottom:4px;">—</div>
-        <div id="debug-parsed" style="color:#00ff00;">—</div>
-      </div>
-      <button onclick="document.getElementById('debug-box').style.display=document.getElementById('debug-box').style.display==='none'?'block':'none'" style="font-size:11px;color:#9ca3af;background:none;border:1px solid #e5e7eb;border-radius:6px;padding:4px 10px;cursor:pointer;">Toggle debug</button>
-      <div class="perm-box" id="perm-box">
-        <strong>⚠️ Camera permission needed</strong>
-        Go to <strong>Settings → Apps → Chrome → Permissions → Camera → Allow</strong> then tap Start Camera again.
-      </div>
+
+  <!-- SCAN PANE — uses native phone camera -->
+  <div id="scan-pane" style="padding:16px;display:flex;flex-direction:column;align-items:center;gap:14px;">
+    <div class="mode-row">
+      <button class="mode-btn on" onclick="setMode('in',this)">Sign in</button>
+      <button class="mode-btn" onclick="setMode('out',this)">Left school</button>
+      <button class="mode-btn" onclick="setMode('leaving-home',this)">🏠 Home<br>on site</button>
+      <button class="mode-btn" onclick="setMode('onsite',this)">🏫 Back<br>on site</button>
     </div>
+
+    <!-- Mode indicator -->
+    <div id="mode-box" style="width:100%;max-width:340px;padding:22px 16px;border-radius:14px;background:#e8f5f0;border:3px solid #1a6b4a;text-align:center;">
+      <div style="font-size:40px;margin-bottom:8px;">📷</div>
+      <div id="mode-label" style="font-size:17px;font-weight:700;color:#1a6b4a;">Sign in mode</div>
+      <div style="font-size:12px;color:#6b7280;margin-top:5px;">Select a mode above then tap Scan</div>
+    </div>
+
+    <!-- Hidden file input — triggers native camera with QR scanning -->
+    <input type="file" id="qr-input" accept="image/*" capture="environment" style="display:none;" onchange="processQRImage(this)">
+
+    <button class="scan-trigger-btn" onclick="document.getElementById('qr-input').click()">📷 Scan QR Card</button>
+
+    <p class="scan-note">Tap <strong>Scan QR Card</strong> to open your camera. Point at the QR code and take a photo — it will be processed automatically.</p>
+
+    <!-- Result display -->
+    <div id="scan-result" style="display:none;width:100%;max-width:340px;padding:14px 16px;border-radius:12px;text-align:center;font-size:14px;font-weight:700;"></div>
   </div>
+
   <div id="child-pane" class="reg-pane" style="display:none;">
     <div class="summary s5">
       <div class="sp"><div class="sn" id="cp">0</div><div class="sl2">Present</div></div>
@@ -245,6 +235,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="fbar" id="child-fbar"></div>
     <div class="child-list" id="child-list"></div>
   </div>
+
   <div id="staff-pane" class="reg-pane" style="display:none;">
     <div class="summary s4">
       <div class="sp"><div class="sn" id="stin">0</div><div class="sl2">In school</div></div>
@@ -254,6 +245,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     </div>
     <div class="child-list" id="staff-list"></div>
   </div>
+
   <div id="nanny-pane" class="reg-pane" style="display:none;">
     <div class="summary s3">
       <div class="sp"><div class="sn" id="nnin">0</div><div class="sl2">On site</div></div>
@@ -262,11 +254,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     </div>
     <div class="child-list" id="nanny-list"></div>
   </div>
+
   <div id="log-pane" style="display:none;">
     <div id="loglist" style="padding:10px 16px 90px;display:flex;flex-direction:column;gap:7px;">
       <div class="empty">No events yet</div>
     </div>
   </div>
+
   <div class="bottom-btns">
     <button class="edit-btn" onclick="goEdit()">Edit</button>
     <button class="exp-btn" onclick="doExport()">Export CSV</button>
@@ -314,11 +308,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 </div>
 
+<script src="https://unpkg.com/@zxing/library@0.19.1/umd/index.min.js"></script>
 <script>
 // ── SERVICE WORKER ─────────────────────────────────────
 if('serviceWorker' in navigator){
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('./sw.js').catch(function(e){console.log('SW failed:',e);});
+    navigator.serviceWorker.register('./sw.js').catch(function(){});
   });
 }
 
@@ -336,9 +331,6 @@ function doInstall(){
     document.getElementById('install-banner').style.display='none';
   });
 }
-window.addEventListener('appinstalled',function(){
-  document.getElementById('install-banner').style.display='none';
-});
 
 // ── CONFIG ─────────────────────────────────────────────
 var CHILD_CLASSES={
@@ -357,12 +349,14 @@ var eventLog=[];
 var scanMode='in';
 var childFilter='All';
 var panelId=null;
-var camOn=false;
-var cool={};
 var currentTab='scan';
 
 var SL={present:'Present',late:'Late',absent:'Absent','signed-out':'Left school','leaving-home':'Home on site',onsite:'Back on site',in:'In school',out:'Left school'};
 var SV={present:'signed in',late:'signed in (late)',absent:'marked absent','signed-out':'left school','leaving-home':'gone home (on site)',onsite:'returned to school grounds',in:'signed in',out:'left school'};
+var MODE_COLORS={'in':'#1a6b4a','out':'#1d4ed8','leaving-home':'#ea580c','onsite':'#7c3aed'};
+var MODE_LABELS={'in':'Sign in mode','out':'Left school mode','leaving-home':'Home on site mode','onsite':'Back on site mode'};
+var MODE_BG={'in':'#e8f5f0','out':'#dbeafe','leaving-home':'#fff7ed','onsite':'#f5f3ff'};
+var MODE_BORDER={'in':'#1a6b4a','out':'#1d4ed8','leaving-home':'#ea580c','onsite':'#7c3aed'};
 
 // ── CLOCK ──────────────────────────────────────────────
 function pad(n){return('0'+n).slice(-2);}
@@ -377,12 +371,8 @@ function tickClock(){
 tickClock();setInterval(tickClock,10000);
 
 // ── LOCAL STORAGE ──────────────────────────────────────
-function saveToDevice(list){
-  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(list));return true;}catch(e){return false;}
-}
-function loadFromDevice(){
-  try{var s=localStorage.getItem(STORAGE_KEY);return s?JSON.parse(s):null;}catch(e){return null;}
-}
+function saveToDevice(list){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(list));return true;}catch(e){return false;}}
+function loadFromDevice(){try{var s=localStorage.getItem(STORAGE_KEY);return s?JSON.parse(s):null;}catch(e){return null;}}
 
 // ── SETUP ROWS ─────────────────────────────────────────
 function addRow(container,type){appendRowToContainer(container,type,'',false,'');refreshCount(container);}
@@ -404,9 +394,10 @@ function refreshCount(container){
   checkStart();
 }
 function checkStart(){
-  var allRows=document.querySelectorAll('.name-rows .name-row');
   var any=false;
-  [].forEach.call(allRows,function(row){var inp=row.querySelector('input[type=text]');if(inp&&inp.value.trim())any=true;});
+  [].forEach.call(document.querySelectorAll('.name-rows .name-row'),function(row){
+    var inp=row.querySelector('input[type=text]');if(inp&&inp.value.trim())any=true;
+  });
   var btn=document.getElementById('start-btn');
   btn.disabled=!any;
   btn.textContent=any?'Start Register →':'Add at least one person to start';
@@ -418,20 +409,17 @@ function checkStart(){
   if(saved&&saved.length){
     ['mm','pn','nu','rc','staff','nanny'].forEach(function(k){document.getElementById('rows-'+k).innerHTML='';});
     saved.forEach(function(p){
-      var container=p.type==='child'?p.cls:p.type;
-      appendRowToContainer(container,p.type,p.name,p.onsite,p.family);
-      refreshCount(container);
+      appendRowToContainer(p.type==='child'?p.cls:p.type,p.type,p.name,p.onsite,p.family);
+      refreshCount(p.type==='child'?p.cls:p.type);
     });
     var notice=document.getElementById('saved-notice');
-    notice.textContent='✓ '+saved.length+' people loaded from this device';
+    notice.textContent='✓ '+saved.length+' people loaded — tap Start Register';
     notice.style.display='block';
-    document.getElementById('intro-text').textContent='Your saved names are loaded below. Tap Start Register to begin, or edit names first.';
+    document.getElementById('intro-text').textContent='Your saved names are loaded. Tap Start Register to begin, or edit names first.';
   } else {
-    // First time - show helper notice
     document.getElementById('first-time-notice').style.display='block';
     ['mm','pn','nu','rc'].forEach(function(k){addRow(k,'child');});
-    addRow('staff','staff');
-    addRow('nanny','nanny');
+    addRow('staff','staff');addRow('nanny','nanny');
   }
 })();
 
@@ -440,11 +428,9 @@ function goLive(){
   people=[];records={};
   var idx=0;
   function processGroup(container,type,clsKey){
-    var rows=document.querySelectorAll('#rows-'+container+' .name-row');
-    [].forEach.call(rows,function(row){
+    [].forEach.call(document.querySelectorAll('#rows-'+container+' .name-row'),function(row){
       var inputs=row.querySelectorAll('input[type=text]');
-      var name=inputs[0]?inputs[0].value.trim():'';
-      if(!name)return;
+      var name=inputs[0]?inputs[0].value.trim():'';if(!name)return;
       var family=inputs[1]?inputs[1].value.trim():'';
       var chk=row.querySelector('input[type=checkbox]');
       var onsite=chk?chk.checked:false;
@@ -457,15 +443,12 @@ function goLive(){
   processGroup('staff','staff','staff');
   processGroup('nanny','nanny','nanny');
   if(!people.length)return;
-  var ok=saveToDevice(people.map(function(p){return{name:p.name,cls:p.cls,type:p.type,onsite:p.onsite,family:p.family};}));
-  var notice=document.getElementById('saved-notice');
-  notice.textContent=ok?'✓ Names saved to this device':'Names loaded';
-  notice.style.display='block';
+  saveToDevice(people.map(function(p){return{name:p.name,cls:p.cls,type:p.type,onsite:p.onsite,family:p.family};}));
   setTimeout(function(){
     document.getElementById('setup-screen').className='screen';
     document.getElementById('main-screen').className='screen active';
     renderAll();
-  },600);
+  },400);
 }
 
 function goEdit(){
@@ -497,11 +480,7 @@ function showTab(t){
   if(t==='log')renderLog();
 }
 
-// ── SCAN ───────────────────────────────────────────────
-var MODE_COLORS={'in':'#1a6b4a','out':'#1d4ed8','leaving-home':'#ea580c','onsite':'#7c3aed'};
-var MODE_LABELS={'in':'Sign in','out':'Left school','leaving-home':'Home on site','onsite':'Back on site'};
-var MODE_CAM_CLS={'in':'','out':'c-out','leaving-home':'c-home','onsite':'c-onsite'};
-
+// ── SCAN MODE ──────────────────────────────────────────
 function setMode(m,btn){
   scanMode=m;
   document.querySelectorAll('.mode-btn').forEach(function(b){b.className='mode-btn';});
@@ -510,149 +489,125 @@ function setMode(m,btn){
   if(m==='onsite')cls='mode-btn on-site';
   if(m==='out')cls='mode-btn on-out';
   btn.className=cls;
-  document.getElementById('cam-wrap').className='cam-wrap '+(MODE_CAM_CLS[m]||'');
-  document.getElementById('scan-line').style.background=MODE_COLORS[m]||'#1a6b4a';
-  document.getElementById('scan-lbl').textContent=MODE_LABELS[m]||m;
+  var box=document.getElementById('mode-box');
+  box.style.background=MODE_BG[m]||'#e8f5f0';
+  box.style.borderColor=MODE_BORDER[m]||'#1a6b4a';
+  document.getElementById('mode-label').style.color=MODE_COLORS[m]||'#1a6b4a';
+  document.getElementById('mode-label').textContent=MODE_LABELS[m]||m;
+  // Reset file input so same card can be scanned again
+  document.getElementById('qr-input').value='';
+  document.getElementById('scan-result').style.display='none';
 }
 
-function startCam(){
-  document.getElementById('perm-box').style.display='none';
-  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
-    document.getElementById('cam-note').textContent='Camera not supported. Try opening in Chrome.';
-    return;
-  }
-  // Galaxy A13 and similar Samsung devices need focusMode set explicitly
-  var constraints={
-    video:{
-      facingMode:{ideal:'environment'},
-      width:{ideal:1280},
-      height:{ideal:720},
-      focusMode:{ideal:'continuous'},
-      advanced:[{focusMode:'continuous'}]
-    }
+// ── NATIVE QR SCAN — processes photo taken by phone camera ──
+function processQRImage(input){
+  if(!input.files||!input.files[0])return;
+  var file=input.files[0];
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var img=new Image();
+    img.onload=function(){
+      var canvas=document.createElement('canvas');
+      canvas.width=img.width;
+      canvas.height=img.height;
+      var ctx=canvas.getContext('2d');
+      ctx.drawImage(img,0,0);
+      var imageData=ctx.getImageData(0,0,canvas.width,canvas.height);
+      // Try ZXing first
+      decodeWithZXing(canvas,img,imageData);
+    };
+    img.src=e.target.result;
   };
-  navigator.mediaDevices.getUserMedia(constraints)
-  .then(function(stream){
-    var v=document.getElementById('qr-video');
-    v.srcObject=stream;
-    v.play();
-    // Apply continuous autofocus via track settings if supported
-    var track=stream.getVideoTracks()[0];
-    if(track&&track.applyConstraints){
-      track.applyConstraints({advanced:[{focusMode:'continuous'}]}).catch(function(){});
-    }
-    document.getElementById('cam-btn').style.display='none';
-    document.getElementById('cam-note').textContent='Ready — point at a QR card.';
-    camOn=true;
-    scanCanvas=document.createElement('canvas');
-    requestAnimationFrame(scanFrame);
-  })
-  .catch(function(err){
-    if(err.name==='NotAllowedError'||err.name==='PermissionDeniedError'){
-      document.getElementById('perm-box').style.display='block';
-      document.getElementById('cam-note').textContent='Camera permission denied — see below.';
-    } else {
-      // Retry with simpler constraints if advanced ones fail
-      navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}}})
-      .then(function(stream){
-        var v=document.getElementById('qr-video');
-        v.srcObject=stream;v.play();
-        document.getElementById('cam-btn').style.display='none';
-        document.getElementById('cam-note').textContent='Ready — point at a QR card.';
-        camOn=true;
-        scanCanvas=document.createElement('canvas');
-        requestAnimationFrame(scanFrame);
-      })
-      .catch(function(err2){
-        document.getElementById('cam-note').textContent='Camera error: '+err2.message;
-      });
-    }
-  });
+  reader.readAsDataURL(file);
+  // Reset input so same card can be scanned again
+  setTimeout(function(){input.value='';},1000);
 }
 
-var scanCanvas=null;
-var lastScanTime=0;
-
-function scanFrame(){
-  if(!camOn)return;
-  var v=document.getElementById('qr-video');
-  if(v.readyState!==v.HAVE_ENOUGH_DATA){requestAnimationFrame(scanFrame);return;}
-  // Throttle to 10 scans/sec — gives camera time to focus between frames
-  var now=Date.now();
-  if(now-lastScanTime<100){requestAnimationFrame(scanFrame);return;}
-  lastScanTime=now;
-  if(!scanCanvas){scanCanvas=document.createElement('canvas');}
-  scanCanvas.width=v.videoWidth;
-  scanCanvas.height=v.videoHeight;
-  var ctx=scanCanvas.getContext('2d');
-  ctx.drawImage(v,0,0);
-  var img=ctx.getImageData(0,0,scanCanvas.width,scanCanvas.height);
-  var code=jsQR(img.data,img.width,img.height,{inversionAttempts:'attemptBoth'});
-  if(code){
+function decodeWithZXing(canvas,img,imageData){
+  try{
+    var hints=new Map();
+    hints.set(ZXing.DecodeHintType.TRY_HARDER,true);
+    var reader=new ZXing.MultiFormatReader();
+    reader.setHints(hints);
+    var lum=new ZXing.RGBLuminanceSource(imageData.data,canvas.width,canvas.height);
+    var bmp=new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(lum));
+    var result=reader.decode(bmp);
+    handleQRText(result.getText());
+  }catch(e){
+    // ZXing failed — try with inverted image
     try{
-      // Show raw data in debug box
-      var debugRaw=document.getElementById('debug-raw');
-      var debugParsed=document.getElementById('debug-parsed');
-      if(debugRaw)debugRaw.textContent='RAW: '+JSON.stringify(code.data);
-
-      // Strip ALL whitespace including tabs
-      var raw=code.data.replace(/^[\s\t\n\r\u0009\u000a\u000d\u0020]+|[\s\t\n\r\u0009\u000a\u000d\u0020]+$/g,'');
-      if(debugRaw)debugRaw.textContent+=' | STRIPPED: '+raw;
-
-      // Add missing curly braces
-      if(raw.charAt(0)!=='{')raw='{'+raw;
-      if(raw.charAt(raw.length-1)!=='}')raw=raw+'}';
-      if(debugParsed)debugParsed.textContent='Attempting parse: '+raw;
-
-      var d=JSON.parse(raw);
-      if(debugParsed)debugParsed.textContent='Parsed OK — id:'+d.id+' n:'+d.n;
-      if(d.id)handleScan(d.id,d);
-    }catch(e){
-      // Fallback: extract fields directly with regex
-      try{
-        var raw2=code.data;
-        var mid=raw2.match(/"id"\s*:\s*"([^"]+)"/);
-        var mn=raw2.match(/"n"\s*:\s*"([^"]+)"/);
-        var mc=raw2.match(/"c"\s*:\s*"([^"]+)"/);
-        var debugParsed2=document.getElementById('debug-parsed');
-        if(mid){
-          if(debugParsed2)debugParsed2.textContent='Regex match — id:'+mid[1]+' n:'+(mn?mn[1]:'?');
-          handleScan(mid[1],{id:mid[1],n:mn?mn[1]:'',c:mc?mc[1]:''});
-        } else {
-          if(debugParsed2)debugParsed2.textContent='FAILED — no id found. Error: '+e.message;
-        }
-      }catch(e2){
-        var debugParsed3=document.getElementById('debug-parsed');
-        if(debugParsed3)debugParsed3.textContent='BOTH methods failed: '+e.message+' / '+e2.message;
+      var ctx2=canvas.getContext('2d');
+      var inv=ctx2.getImageData(0,0,canvas.width,canvas.height);
+      for(var i=0;i<inv.data.length;i+=4){
+        inv.data[i]=255-inv.data[i];
+        inv.data[i+1]=255-inv.data[i+1];
+        inv.data[i+2]=255-inv.data[i+2];
       }
+      var lum2=new ZXing.RGBLuminanceSource(inv.data,canvas.width,canvas.height);
+      var bmp2=new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(lum2));
+      var reader2=new ZXing.MultiFormatReader();
+      var result2=reader2.decode(bmp2);
+      handleQRText(result2.getText());
+    }catch(e2){
+      showScanResult('Could not read QR code — try again','#dc2626','#fee2e2');
     }
   }
-  requestAnimationFrame(scanFrame);
 }
 
-var CLASS_NAME_MAP={'mini martlets':'mm','pre-nursery':'pn','prenursery':'pn','nursery':'nu','reception':'rc','staff':'staff','nanny':'nanny'};
+function handleQRText(text){
+  // Strip whitespace including tabs
+  var raw=text.replace(/^[\s\t\n\r]+|[\s\t\n\r]+$/g,'');
+  // Add missing curly braces
+  if(raw.charAt(0)!=='{')raw='{'+raw;
+  if(raw.charAt(raw.length-1)!=='}')raw=raw+'}';
+  try{
+    var d=JSON.parse(raw);
+    if(d.id){handleScan(d.id,d);return;}
+  }catch(e){}
+  // Regex fallback
+  var mid=text.match(/"id"\s*:\s*"([^"]+)"/);
+  var mn=text.match(/"n"\s*:\s*"([^"]+)"/);
+  var mc=text.match(/"c"\s*:\s*"([^"]+)"/);
+  if(mid){handleScan(mid[1],{id:mid[1],n:mn?mn[1]:'',c:mc?mc[1]:''});return;}
+  showScanResult('Card not recognised — check name matches','#d97706','#fef3c7');
+}
 
+function showScanResult(msg,color,bg){
+  var el=document.getElementById('scan-result');
+  el.textContent=msg;
+  el.style.color=color;
+  el.style.background=bg;
+  el.style.border='1.5px solid '+color;
+  el.style.display='block';
+  setTimeout(function(){el.style.display='none';},3000);
+}
+
+// ── HANDLE SCAN ────────────────────────────────────────
+var cool={};
 function handleScan(id,qrData){
   if(cool[id]&&Date.now()-cool[id]<3000)return;
   cool[id]=Date.now();
   var p=people.find(function(x){return x.id===id;});
   if(!p&&qrData&&qrData.n){
-    var qrName=(qrData.n||'').trim().toLowerCase();
-    p=people.find(function(x){return x.name.toLowerCase()===qrName;});
+    var qn=(qrData.n||'').trim().toLowerCase();
+    p=people.find(function(x){return x.name.toLowerCase()===qn;});
     if(p)cool[p.id]=Date.now();
   }
   if(!p&&qrData&&qrData.c){
+    var CLASS_NAME_MAP={'mini martlets':'mm','pre-nursery':'pn','prenursery':'pn','nursery':'nu','reception':'rc','staff':'staff','nanny':'nanny'};
     var clsKey=CLASS_NAME_MAP[(qrData.c||'').trim().toLowerCase()]||qrData.c;
-    var qn=(qrData.n||'').trim().toLowerCase();
-    p=people.find(function(x){return x.cls===clsKey&&x.name.toLowerCase().indexOf(qn)>-1;});
+    var qn2=(qrData.n||'').trim().toLowerCase();
+    p=people.find(function(x){return x.cls===clsKey&&x.name.toLowerCase().indexOf(qn2)>-1;});
     if(p)cool[p.id]=Date.now();
   }
-  if(!p){showToast('Card not recognised — check name matches','warn');return;}
+  if(!p){showScanResult('Card not in register — check name matches','#d97706','#fef3c7');showToast('Card not recognised','warn');return;}
   var status;
   if(scanMode==='in')status=p.type==='child'?(minNow()>CUTOFF?'late':'present'):'in';
   else if(scanMode==='out')status=p.type==='child'?'signed-out':'out';
   else status=scanMode;
   mark(p.id,status,true);
+  var typeLabel=p.type==='nanny'?'Nanny ':p.type==='staff'?'Staff ':'';
+  showScanResult('✓ '+typeLabel+p.name+' — '+(SV[status]||status),MODE_COLORS[scanMode]||'#1a6b4a',MODE_BG[scanMode]||'#e8f5f0');
 }
 
 // ── MARK ───────────────────────────────────────────────
@@ -660,15 +615,13 @@ function mark(id,status,fromScan){
   var p=people.find(function(x){return x.id===id;});if(!p)return;
   var t=nowStr();
   records[id].status=status;records[id].time=t;
-  var verb=SV[status]||status;
-  var typeLabel=p.type==='nanny'?'Nanny':p.type==='staff'?'Staff':'';
-  eventLog.unshift({name:p.name,cls:p.cls,type:p.type,status:status,time:t,verb:verb,onsite:p.onsite,family:p.family});
+  eventLog.unshift({name:p.name,cls:p.cls,type:p.type,status:status,time:t,verb:SV[status]||status,onsite:p.onsite,family:p.family});
   if(fromScan){
     var tt='ok';
     if(status==='absent')tt='warn';
     if(status==='leaving-home')tt='home';
     if(status==='onsite')tt='site';
-    showToast((typeLabel?typeLabel+': ':'')+p.name+' — '+verb,tt);
+    showToast(p.name+' — '+(SV[status]||status),tt);
   }
   renderAll();
 }
@@ -680,11 +633,9 @@ function renderAll(){
   if(currentTab==='nanny')renderAdults('nanny');
   if(currentTab==='log')renderLog();
 }
-
 function renderChildren(){
-  var classes=Object.keys(CHILD_CLASSES);
   var fbar=document.getElementById('child-fbar');
-  fbar.innerHTML=['All'].concat(classes.map(function(k){return CHILD_CLASSES[k].name;})).map(function(n){
+  fbar.innerHTML=['All'].concat(Object.keys(CHILD_CLASSES).map(function(k){return CHILD_CLASSES[k].name;})).map(function(n){
     return'<div class="fp'+(childFilter===n?' on':'')+'" onclick="setChildFilter(\''+n+'\')">'+n+'</div>';
   }).join('');
   var shown=childFilter==='All'?people.filter(function(p){return p.type==='child';}):
@@ -696,10 +647,9 @@ function renderChildren(){
   document.getElementById('ct').textContent=shown.length;
   var ord={absent:0,late:1,'signed-out':2,'leaving-home':3,onsite:4,present:5};
   shown.sort(function(a,b){return(ord[records[a.id].status]||0)-(ord[records[b.id].status]||0);});
-  document.getElementById('child-list').innerHTML=shown.map(function(p){return personCard(p);}).join('');
+  document.getElementById('child-list').innerHTML=shown.map(personCard).join('');
 }
 function setChildFilter(f){childFilter=f;renderChildren();}
-
 function renderAdults(type){
   var list=people.filter(function(p){return p.type===type;});
   var inEl=document.getElementById(type==='staff'?'stin':'nnin');
@@ -708,27 +658,21 @@ function renderAdults(type){
   if(inEl)inEl.textContent=list.filter(function(p){return records[p.id].status==='in';}).length;
   if(outEl)outEl.textContent=list.filter(function(p){return records[p.id].status==='out';}).length;
   if(totEl)totEl.textContent=list.length;
-  if(type==='staff'){var homeEl=document.getElementById('sthome');if(homeEl)homeEl.textContent=list.filter(function(p){return records[p.id].status==='leaving-home';}).length;}
-  var ord={out:0,'leaving-home':1,onsite:2,in:3};
-  list.sort(function(a,b){return(ord[records[a.id].status]||0)-(ord[records[b.id].status]||0);});
-  document.getElementById(type+'-list').innerHTML=list.map(function(p){return personCard(p);}).join('');
+  if(type==='staff'){var h=document.getElementById('sthome');if(h)h.textContent=list.filter(function(p){return records[p.id].status==='leaving-home';}).length;}
+  list.sort(function(a,b){return({'out':0,'leaving-home':1,'onsite':2,'in':3}[records[a.id].status]||0)-({'out':0,'leaving-home':1,'onsite':2,'in':3}[records[b.id].status]||0);});
+  document.getElementById(type+'-list').innerHTML=list.map(personCard).join('');
 }
-
 function personCard(p){
   var r=records[p.id];
   var ini=p.name.split(' ').map(function(x){return x[0];}).join('').slice(0,2).toUpperCase();
   var status=r.status;
-  var label=SL[status]||status;
-  var sub='';
-  if(p.type==='child')sub=(CHILD_CLASSES[p.cls]?CHILD_CLASSES[p.cls].name:'')+(r.time?' · '+r.time:'');
-  else if(p.type==='nanny')sub='Nanny'+(p.family?' — '+p.family+' family':'')+(r.time?' · '+r.time:'');
-  else sub='Staff'+(r.time?' · '+r.time:'');
-  var pip=p.onsite?'<span class="onsite-pip" title="Lives on site"></span>':'';
+  var sub=p.type==='child'?(CHILD_CLASSES[p.cls]?CHILD_CLASSES[p.cls].name:'')+(r.time?' · '+r.time:''):
+    p.type==='nanny'?'Nanny'+(p.family?' — '+p.family+' family':'')+(r.time?' · '+r.time:''):
+    'Staff'+(r.time?' · '+r.time:'');
   return'<div class="cc" onclick="openPanel(\''+p.id+'\')">'+
     '<div class="av '+status+'">'+ini+'</div>'+
-    '<div class="ci"><div class="cn">'+p.name+pip+'</div><div class="cs">'+sub+'</div></div>'+
-    '<span class="stag '+status+'">'+label+'</span>'+
-  '</div>';
+    '<div class="ci"><div class="cn">'+p.name+(p.onsite?'<span class="onsite-pip"></span>':'')+'</div><div class="cs">'+sub+'</div></div>'+
+    '<span class="stag '+status+'">'+(SL[status]||status)+'</span></div>';
 }
 
 // ── PANEL ──────────────────────────────────────────────
@@ -736,14 +680,13 @@ function openPanel(id){
   panelId=id;
   var p=people.find(function(x){return x.id===id;});if(!p)return;
   var r=records[id];
-  var typeLabel=p.type==='nanny'?' (Nanny)':p.type==='staff'?' (Staff)':'';
-  document.getElementById('pname').textContent=p.name+(p.onsite?' 🏠':'')+typeLabel;
+  document.getElementById('pname').textContent=p.name+(p.onsite?' 🏠':'')+(p.type==='nanny'?' (Nanny)':p.type==='staff'?' (Staff)':'');
   document.getElementById('psub').textContent=(p.type==='child'&&CHILD_CLASSES[p.cls]?CHILD_CLASSES[p.cls].name:p.type)+' · '+(SL[r.status]||r.status);
   var isChild=p.type==='child';
   document.getElementById('panel-child-btns').style.display=isChild?'block':'none';
   document.getElementById('panel-adult-btns').style.display=isChild?'none':'block';
-  if(isChild){document.getElementById('panel-onsite-section').style.display=p.onsite?'block':'none';}
-  else{document.getElementById('panel-staff-onsite').style.display=p.onsite?'grid':'none';}
+  if(isChild)document.getElementById('panel-onsite-section').style.display=p.onsite?'block':'none';
+  else document.getElementById('panel-staff-onsite').style.display=p.onsite?'grid':'none';
   document.getElementById('panel').className='overlay open';
 }
 function closePanel(){document.getElementById('panel').className='overlay';panelId=null;}
@@ -754,14 +697,11 @@ function renderLog(){
   var el=document.getElementById('loglist');
   if(!eventLog.length){el.innerHTML='<div class="empty">No events yet</div>';return;}
   el.innerHTML=eventLog.map(function(e){
-    var typeLabel=e.type==='nanny'?' (Nanny)':e.type==='staff'?' (Staff)':'';
-    return'<div class="le">'+
-      '<div class="ldot '+e.status+'"></div>'+
-      '<div class="lt"><strong>'+e.name+'</strong>'+typeLabel+' '+e.verb+
-        (e.family?' <span style="color:#9ca3af">('+e.family+' family)</span>':'')+
-        '<br><span style="font-size:10px;color:#9ca3af">'+(e.type==='child'&&CHILD_CLASSES[e.cls]?CHILD_CLASSES[e.cls].name:e.type)+'</span></div>'+
-      '<div class="ltime">'+e.time+'</div>'+
-    '</div>';
+    return'<div class="le"><div class="ldot '+e.status+'"></div>'+
+      '<div class="lt"><strong>'+e.name+'</strong>'+(e.type==='nanny'?' (Nanny)':e.type==='staff'?' (Staff)':'')+' '+e.verb+
+      (e.family?' <span style="color:#9ca3af">('+e.family+' family)</span>':'')+
+      '<br><span style="font-size:10px;color:#9ca3af">'+(e.type==='child'&&CHILD_CLASSES[e.cls]?CHILD_CLASSES[e.cls].name:e.type)+'</span></div>'+
+      '<div class="ltime">'+e.time+'</div></div>';
   }).join('');
 }
 
