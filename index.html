@@ -435,24 +435,93 @@ function checkStart(){
   btn.textContent=any?'Start Register →':'Add at least one person to start';
 }
 
-// ── LOAD SAVED NAMES ───────────────────────────────────
+// ── HARDCODED PEOPLE — always available on any device ────
+var HARDCODED_PEOPLE=[
+  {name:"Ottilie Daubney",cls:"mm",type:"child",onsite:false,family:""},
+  {name:"Joseph Desruelle",cls:"mm",type:"child",onsite:false,family:""},
+  {name:"Etta Dunn",cls:"mm",type:"child",onsite:false,family:""},
+  {name:"Akira Kanzig",cls:"mm",type:"child",onsite:true,family:""},
+  {name:"Ella Kowalski",cls:"mm",type:"child",onsite:false,family:""},
+  {name:"Neema Milele",cls:"mm",type:"child",onsite:false,family:""},
+  {name:"Lochlan Morrison",cls:"mm",type:"child",onsite:false,family:""},
+  {name:"Zoe Prettejohn",cls:"mm",type:"child",onsite:false,family:""},
+  {name:"Vesper Campbell Clause",cls:"pn",type:"child",onsite:false,family:""},
+  {name:"Murray Dunn",cls:"pn",type:"child",onsite:false,family:""},
+  {name:"Joyce Kaihura",cls:"pn",type:"child",onsite:false,family:""},
+  {name:"Kerem Kauffman",cls:"pn",type:"child",onsite:false,family:""},
+  {name:"Abigail Kruger",cls:"pn",type:"child",onsite:false,family:""},
+  {name:"Felix Louwerse",cls:"pn",type:"child",onsite:false,family:""},
+  {name:"Josef Miller",cls:"pn",type:"child",onsite:false,family:""},
+  {name:"Louisa Morley",cls:"pn",type:"child",onsite:false,family:""},
+  {name:"Zaiah Muia",cls:"pn",type:"child",onsite:false,family:""},
+  {name:"Lalita Pandya",cls:"pn",type:"child",onsite:false,family:""},
+  {name:"Araminta Ritchie",cls:"pn",type:"child",onsite:false,family:""},
+  {name:"Cala Puerta",cls:"pn",type:"child",onsite:false,family:""},
+  {name:"Emmaculate Waithaka",cls:"pn",type:"child",onsite:false,family:""},
+  {name:"Nave Yadid",cls:"pn",type:"child",onsite:false,family:""},
+  {name:"Shilo Yadid",cls:"pn",type:"child",onsite:false,family:""},
+  {name:"Cassian Birkwood Robinson",cls:"nu",type:"child",onsite:false,family:""},
+  {name:"Max Chapman",cls:"nu",type:"child",onsite:true,family:""},
+  {name:"Oscar Daubney",cls:"nu",type:"child",onsite:false,family:""},
+  {name:"Tiago Lagat",cls:"nu",type:"child",onsite:true,family:""},
+  {name:"Elsa Maciocia",cls:"nu",type:"child",onsite:false,family:""},
+  {name:"Lorien Rowe-Bastard",cls:"nu",type:"child",onsite:false,family:""},
+  {name:"Bea Miller",cls:"nu",type:"child",onsite:false,family:""},
+  {name:"Nathan Arkle",cls:"rc",type:"child",onsite:false,family:""},
+  {name:"Ralph Barlow Ngugi",cls:"rc",type:"child",onsite:false,family:""},
+  {name:"Juno Campbell Clause",cls:"rc",type:"child",onsite:false,family:""},
+  {name:"Daniella Cillie-Najjar",cls:"rc",type:"child",onsite:false,family:""},
+  {name:"Marceau Desruelle",cls:"rc",type:"child",onsite:false,family:""},
+  {name:"Rose Kennedy",cls:"rc",type:"child",onsite:false,family:""},
+  {name:"Tsuf Lando",cls:"rc",type:"child",onsite:false,family:""},
+  {name:"Dimitri Mackton",cls:"rc",type:"child",onsite:false,family:""},
+  {name:"Marc Mazurier",cls:"rc",type:"child",onsite:false,family:""},
+  {name:"James Morley",cls:"rc",type:"child",onsite:false,family:""},
+  {name:"Oliver Morrison",cls:"rc",type:"child",onsite:false,family:""},
+  {name:"Tessa Prettejohn",cls:"rc",type:"child",onsite:false,family:""},
+  {name:"Beatrice Ritchie",cls:"rc",type:"child",onsite:false,family:""},
+  {name:"Sebastian Stace - Rosberg",cls:"rc",type:"child",onsite:false,family:""},
+  {name:"Ms Tiva",cls:"staff",type:"staff",onsite:false,family:""},
+  {name:"Ms Amelia",cls:"staff",type:"staff",onsite:true,family:""},
+  {name:"Ms Shari",cls:"staff",type:"staff",onsite:false,family:""},
+  {name:"Ms Charity",cls:"staff",type:"staff",onsite:false,family:""},
+  {name:"Ms Miriam N",cls:"staff",type:"staff",onsite:false,family:""},
+  {name:"Ms Abby",cls:"staff",type:"staff",onsite:false,family:""},
+  {name:"Ms Anne",cls:"staff",type:"staff",onsite:false,family:""},
+  {name:"Ms Miriam",cls:"staff",type:"staff",onsite:false,family:""},
+  {name:"Faith",cls:"nanny",type:"nanny",onsite:false,family:"Louwerse"},
+  {name:"Elizabeth",cls:"nanny",type:"nanny",onsite:false,family:"Kauffman"},
+  {name:"Esther",cls:"nanny",type:"nanny",onsite:false,family:"Miller"},
+  {name:"Doreen",cls:"nanny",type:"nanny",onsite:false,family:"Puerta"},
+  {name:"Joyce",cls:"nanny",type:"nanny",onsite:false,family:"Ritchie"},
+  {name:"Lucy",cls:"nanny",type:"nanny",onsite:false,family:"Ritchie"},
+  {name:"Asha",cls:"nanny",type:"nanny",onsite:false,family:"Dunn"},
+  {name:"Damaris",cls:"nanny",type:"nanny",onsite:false,family:"Dunn"},
+  {name:"Joseph",cls:"nanny",type:"nanny",onsite:false,family:"Dunn"},
+  {name:"Anne",cls:"nanny",type:"nanny",onsite:false,family:"Yadid"},
+  {name:"Margaret",cls:"nanny",type:"nanny",onsite:false,family:"Waithaka"},
+  {name:"Serah",cls:"nanny",type:"nanny",onsite:false,family:"Muia"},
+  {name:"Rhoida",cls:"nanny",type:"nanny",onsite:false,family:"Prettejohn"},
+  {name:"Yvonne",cls:"nanny",type:"nanny",onsite:false,family:"Daubney"},
+  {name:"Polly",cls:"nanny",type:"nanny",onsite:false,family:"Morrison"},
+  {name:"Marion",cls:"nanny",type:"nanny",onsite:false,family:"Kowalski"},
+  {name:"Mary",cls:"nanny",type:"nanny",onsite:false,family:"Kanzig"},
+  {name:"Alice",cls:"nanny",type:"nanny",onsite:false,family:"Desruelle"},
+  {name:"Antonela",cls:"nanny",type:"nanny",onsite:false,family:"Desruelle"}
+];
+
 (function(){
-  var saved=loadFromDevice();
-  if(saved&&saved.length){
-    ['mm','pn','nu','rc','staff','nanny'].forEach(function(k){document.getElementById('rows-'+k).innerHTML='';});
-    saved.forEach(function(p){
-      appendRowToContainer(p.type==='child'?p.cls:p.type,p.type,p.name,p.onsite,p.family);
-      refreshCount(p.type==='child'?p.cls:p.type);
-    });
-    var notice=document.getElementById('saved-notice');
-    notice.textContent='✓ '+saved.length+' people loaded — tap Start Register';
-    notice.style.display='block';
-    document.getElementById('intro-text').textContent='Your saved names are loaded. Tap Start Register to begin, or edit names first.';
-  } else {
-    document.getElementById('first-time-notice').style.display='block';
-    ['mm','pn','nu','rc'].forEach(function(k){addRow(k,'child');});
-    addRow('staff','staff');addRow('nanny','nanny');
-  }
+  var list=loadFromDevice()||HARDCODED_PEOPLE;
+  ['mm','pn','nu','rc','staff','nanny'].forEach(function(k){document.getElementById('rows-'+k).innerHTML='';});
+  list.forEach(function(p){
+    appendRowToContainer(p.type==='child'?p.cls:p.type,p.type,p.name,p.onsite,p.family);
+    refreshCount(p.type==='child'?p.cls:p.type);
+  });
+  var notice=document.getElementById('saved-notice');
+  notice.textContent='✓ '+list.length+' people loaded — tap Start Register';
+  notice.style.display='block';
+  document.getElementById('first-time-notice').style.display='none';
+  document.getElementById('intro-text').textContent='All names loaded. Tap Start Register to begin, or edit first.';
 })();
 
 // ── GO LIVE ────────────────────────────────────────────
