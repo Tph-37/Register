@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Register">
 <meta name="theme-color" content="#1a6b4a">
 <title>Pre-Prep Register</title>
 <link rel="manifest" href="./manifest.json">
@@ -17,18 +15,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .hdr{background:#1a6b4a;color:#fff;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;}
 .hdr h1{font-size:16px;font-weight:700;}.hdr-sub{font-size:11px;opacity:.75;margin-top:1px;}
 .clock{background:rgba(255,255,255,.2);border-radius:8px;padding:4px 10px;font-size:15px;font-weight:700;}
-#install-banner{background:#1d4ed8;color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
-#install-banner p{font-size:12px;line-height:1.4;flex:1;}
-#install-banner strong{display:block;font-size:13px;margin-bottom:2px;}
-.install-btn{background:#fff;color:#1d4ed8;border:none;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;}
-.dismiss-btn{background:none;border:none;color:rgba(255,255,255,.7);font-size:20px;cursor:pointer;padding:0 4px;}
 .setup-body{padding:16px 16px 180px;}
 .intro{background:#1a6b4a;color:#fff;border-radius:12px;padding:18px 20px;margin-bottom:16px;}
 .intro h2{font-size:18px;font-weight:700;margin-bottom:6px;}
 .intro p{font-size:13px;opacity:.85;line-height:1.5;}
-.first-time-notice{background:#fff;border:2px solid #1a6b4a;border-radius:12px;padding:16px;margin-bottom:16px;}
-.first-time-notice h3{font-size:14px;font-weight:700;color:#1a6b4a;margin-bottom:6px;}
-.first-time-notice p{font-size:12px;color:#6b7280;line-height:1.5;}
 .cls-card{background:#fff;border-radius:12px;border:1px solid #e5e7eb;margin-bottom:12px;overflow:hidden;}
 .cls-top{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid #f3f4f6;}
 .cls-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
@@ -48,7 +38,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .start-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e5e7eb;padding:14px 16px;}
 .start-btn{width:100%;padding:15px;background:#1a6b4a;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;}
 .start-btn:disabled{background:#9ca3af;cursor:default;}
-.saved-notice{font-size:12px;color:#1a6b4a;text-align:center;margin-bottom:8px;display:none;}
+.saved-notice{font-size:12px;color:#1a6b4a;text-align:center;margin-bottom:8px;}
 .tabs{display:flex;background:#fff;border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:50;overflow-x:auto;scrollbar-width:none;}
 .tabs::-webkit-scrollbar{display:none;}
 .tab{flex:1;padding:11px 4px;text-align:center;font-size:11px;font-weight:600;color:#6b7280;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;min-width:60px;}
@@ -59,7 +49,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .mode-btn.on-home{border-color:#ea580c;background:#fff7ed;color:#ea580c;}
 .mode-btn.on-site{border-color:#7c3aed;background:#f5f3ff;color:#7c3aed;}
 .mode-btn.on-out{border-color:#1d4ed8;background:#dbeafe;color:#1d4ed8;}
-.scan-trigger-btn{width:100%;max-width:300px;padding:18px;background:#1a6b4a;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:.02em;}
+.scan-btn{width:100%;max-width:340px;padding:18px;background:#1a6b4a;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;}
 .scan-note{font-size:12px;color:#6b7280;text-align:center;max-width:280px;line-height:1.5;}
 .reg-pane{display:flex;flex-direction:column;}
 .summary{display:grid;gap:4px;padding:10px 12px;background:#fff;border-bottom:1px solid #e5e7eb;}
@@ -77,17 +67,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .cc{background:#fff;border-radius:12px;border:1px solid #e5e7eb;padding:11px 13px;display:flex;align-items:center;gap:10px;}
 .cc:active{opacity:.85;}
 .av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
-.av.present{background:#e8f5f0;color:#1a6b4a;}.av.absent{background:#f3f4f6;color:#6b7280;}
-.av.late{background:#fef3c7;color:#d97706;}.av.signed-out{background:#dbeafe;color:#1d4ed8;}
-.av.leaving-home{background:#fff7ed;color:#ea580c;}.av.onsite{background:#f5f3ff;color:#7c3aed;}
-.av.in{background:#e8f5f0;color:#1a6b4a;}.av.out{background:#f3f4f6;color:#6b7280;}
+.av.present,.av.in{background:#e8f5f0;color:#1a6b4a;}
+.av.absent,.av.out{background:#f3f4f6;color:#6b7280;}
+.av.late{background:#fef3c7;color:#d97706;}
+.av.signed-out{background:#dbeafe;color:#1d4ed8;}
+.av.leaving-home{background:#fff7ed;color:#ea580c;}
+.av.onsite{background:#f5f3ff;color:#7c3aed;}
 .ci{flex:1;min-width:0;}.cn{font-size:14px;font-weight:700;}.cs{font-size:11px;color:#6b7280;margin-top:1px;}
 .onsite-pip{display:inline-block;width:7px;height:7px;border-radius:50%;background:#7c3aed;margin-left:5px;vertical-align:middle;}
 .stag{font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;flex-shrink:0;text-align:center;line-height:1.4;}
-.stag.present{background:#e8f5f0;color:#1a6b4a;}.stag.absent{background:#f3f4f6;color:#6b7280;}
-.stag.late{background:#fef3c7;color:#d97706;}.stag.signed-out{background:#dbeafe;color:#1d4ed8;}
-.stag.leaving-home{background:#fff7ed;color:#ea580c;}.stag.onsite{background:#f5f3ff;color:#7c3aed;}
-.stag.in{background:#e8f5f0;color:#1a6b4a;}.stag.out{background:#f3f4f6;color:#6b7280;}
+.stag.present,.stag.in{background:#e8f5f0;color:#1a6b4a;}
+.stag.absent,.stag.out{background:#f3f4f6;color:#6b7280;}
+.stag.late{background:#fef3c7;color:#d97706;}
+.stag.signed-out{background:#dbeafe;color:#1d4ed8;}
+.stag.leaving-home{background:#fff7ed;color:#ea580c;}
+.stag.onsite{background:#f5f3ff;color:#7c3aed;}
 .le{background:#fff;border-radius:10px;border:1px solid #e5e7eb;padding:9px 13px;display:flex;gap:9px;}
 .ldot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;}
 .ldot.present,.ldot.late,.ldot.in{background:#1a6b4a;}
@@ -96,7 +90,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ldot.leaving-home{background:#ea580c;}
 .ldot.onsite{background:#7c3aed;}
 .lt{flex:1;font-size:12px;line-height:1.5;}
-.ltime{font-size:11px;color:#9ca3af;flex-shrink:0;font-variant-numeric:tabular-nums;}
+.ltime{font-size:11px;color:#9ca3af;flex-shrink:0;}
 .empty{text-align:center;padding:40px 20px;color:#9ca3af;font-size:13px;}
 .overlay{position:fixed;inset:0;z-index:100;display:none;flex-direction:column;justify-content:flex-end;}
 .overlay.open{display:flex;}
@@ -108,7 +102,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .psect{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9ca3af;margin-bottom:7px;}
 .obtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
 .obtn{padding:12px 6px;border-radius:10px;font-size:13px;font-weight:700;border:none;cursor:pointer;line-height:1.3;text-align:center;}
-.obtn:active{opacity:.85;}
 .obtn.present{background:#e8f5f0;color:#1a6b4a;}.obtn.late{background:#fef3c7;color:#d97706;}
 .obtn.absent{background:#f3f4f6;color:#6b7280;}.obtn.sout{background:#dbeafe;color:#1d4ed8;}
 .obtn.leaving-home{background:#fff7ed;color:#ea580c;border:1.5px solid #fed7aa;}
@@ -121,17 +114,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .toast{position:fixed;top:68px;left:50%;transform:translateX(-50%);padding:8px 16px;border-radius:24px;font-size:13px;font-weight:600;z-index:200;opacity:0;transition:opacity .2s;white-space:nowrap;max-width:90vw;text-align:center;color:#fff;}
 .toast.show{opacity:1;}
 .toast.ok{background:#1a6b4a;}.toast.err{background:#dc2626;}.toast.warn{background:#d97706;}.toast.home{background:#ea580c;}.toast.site{background:#7c3aed;}
+.scan-result{width:100%;max-width:340px;padding:14px 16px;border-radius:12px;text-align:center;font-size:14px;font-weight:700;display:none;}
+.mode-box{width:100%;max-width:340px;padding:20px 16px;border-radius:14px;text-align:center;background:#e8f5f0;border:3px solid #1a6b4a;}
 </style>
 </head>
 <body>
 <div class="toast" id="toast"></div>
-<div id="install-banner" style="display:none;">
-  <p><strong>📲 Install as App</strong>Tap Install for offline use</p>
-  <button class="install-btn" id="install-btn" onclick="doInstall()">Install</button>
-  <button class="dismiss-btn" onclick="document.getElementById('install-banner').style.display='none'">×</button>
-</div>
 
-<!-- SETUP SCREEN -->
+<!-- SETUP -->
 <div class="screen active" id="setup-screen">
   <div class="hdr">
     <div><h1>Pre-Prep Register</h1><div class="hdr-sub">Setup</div></div>
@@ -139,12 +129,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
   <div class="setup-body">
     <div class="intro">
-      <h2>Welcome</h2>
-      <p id="intro-text">Enter your people below. Names save to this device — you only need to do this once.</p>
-    </div>
-    <div class="first-time-notice" id="first-time-notice" style="display:none;">
-      <h3>First time setup</h3>
-      <p>Add all your students, staff and nannies below then tap <strong>Start Register</strong>. Your names will be saved to this phone.</p>
+      <h2>Pre-Prep Register</h2>
+      <p>All names are loaded below. Tap <strong>Start Register</strong> to begin. Use Edit to add or remove names.</p>
     </div>
     <div class="cls-card">
       <div class="cls-top"><div class="cls-dot" style="background:#7c3aed;"></div><div class="cls-title">Mini Martlets</div><div class="cls-n" id="cnt-mm">0</div></div>
@@ -169,7 +155,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="cls-card">
       <div class="cls-top"><div class="cls-dot" style="background:#d97706;"></div><div class="cls-title">Staff <span class="role-badge staff">STAFF</span></div><div class="cls-n" id="cnt-staff">0</div></div>
       <div class="name-rows" id="rows-staff"></div>
-      <button class="add-row-btn" onclick="addRow('staff','staff')">+ Add staff member</button>
+      <button class="add-row-btn" onclick="addRow('staff','staff')">+ Add staff</button>
     </div>
     <div class="cls-card">
       <div class="cls-top"><div class="cls-dot" style="background:#7c3aed;"></div><div class="cls-title">Nannies <span class="role-badge nanny">NANNY</span></div><div class="cls-n" id="cnt-nanny">0</div></div>
@@ -179,11 +165,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
   <div class="start-bar">
     <div class="saved-notice" id="saved-notice"></div>
-    <button class="start-btn" id="start-btn" onclick="goLive()" disabled>Add at least one person to start</button>
+    <button class="start-btn" id="start-btn" onclick="goLive()" disabled>Loading...</button>
   </div>
 </div>
 
-<!-- MAIN SCREEN -->
+<!-- MAIN -->
 <div class="screen" id="main-screen">
   <div class="hdr">
     <div><h1>Pre-Prep Register</h1><div class="hdr-sub" id="main-date"></div></div>
@@ -197,7 +183,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="tab" id="tab-log" onclick="showTab('log')">Log</div>
   </div>
 
-  <!-- SCAN PANE — uses native phone camera -->
   <div id="scan-pane" style="padding:16px;display:flex;flex-direction:column;align-items:center;gap:14px;">
     <div class="mode-row">
       <button class="mode-btn on" onclick="setMode('in',this)">Sign in</button>
@@ -205,31 +190,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <button class="mode-btn" onclick="setMode('leaving-home',this)">🏠 Home<br>on site</button>
       <button class="mode-btn" onclick="setMode('onsite',this)">🏫 Back<br>on site</button>
     </div>
-
-    <!-- Mode indicator -->
-    <div id="mode-box" style="width:100%;max-width:340px;padding:22px 16px;border-radius:14px;background:#e8f5f0;border:3px solid #1a6b4a;text-align:center;">
-      <div style="font-size:40px;margin-bottom:8px;">📷</div>
-      <div id="mode-label" style="font-size:17px;font-weight:700;color:#1a6b4a;">Sign in mode</div>
-      <div style="font-size:12px;color:#6b7280;margin-top:5px;">Select a mode above then tap Scan</div>
+    <div class="mode-box" id="mode-box">
+      <div style="font-size:36px;margin-bottom:8px;">📷</div>
+      <div id="mode-label" style="font-size:16px;font-weight:700;color:#1a6b4a;">Sign in mode</div>
+      <div style="font-size:12px;color:#6b7280;margin-top:4px;">Select mode above then tap Scan</div>
     </div>
-
-    <!-- Hidden file input — triggers native camera with QR scanning -->
-    <input type="file" id="qr-input" accept="image/*" capture="environment" style="display:none;" onchange="processQRImage(this)">
-
-    <button class="scan-trigger-btn" onclick="document.getElementById('qr-input').click()">📷 Scan QR Card</button>
-
-    <p class="scan-note">Tap <strong>Scan QR Card</strong> to open your camera. Point at the QR code and take a photo — it will be processed automatically.</p>
-
-    <!-- Result display -->
-    <div id="scan-result" style="display:none;width:100%;max-width:340px;padding:14px 16px;border-radius:12px;text-align:center;font-size:14px;font-weight:700;"></div>
-
-    <!-- Manual entry fallback -->
-    <div id="manual-entry-box" style="display:none;width:100%;max-width:340px;background:#fff;border:2px solid #1a6b4a;border-radius:12px;padding:14px;">
-      <div style="font-size:12px;font-weight:700;color:#1a6b4a;margin-bottom:8px;">Manual lookup</div>
-      <div style="font-size:11px;color:#6b7280;margin-bottom:10px;">Type a name to find and mark them:</div>
-      <input type="text" id="manual-input" placeholder="Start typing a name..." oninput="manualSearch(this.value)"
-        style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:9px 12px;font-size:14px;margin-bottom:8px;">
-      <div id="manual-results" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;"></div>
+    <input type="file" id="qr-input" accept="image/*" capture="environment" style="display:none;" onchange="processPhoto(this)">
+    <button class="scan-btn" onclick="document.getElementById('qr-input').click()">📷 Scan QR Card</button>
+    <p class="scan-note">Tap <strong>Scan QR Card</strong> — your camera opens. Point at the QR code and take a photo.</p>
+    <div class="scan-result" id="scan-result"></div>
+    <div style="width:100%;max-width:340px;background:#fff;border:1.5px solid #e5e7eb;border-radius:12px;padding:14px;">
+      <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:8px;">🔍 Or search by name</div>
+      <input type="text" id="search-input" placeholder="Type a name..." oninput="doSearch(this.value)"
+        style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:9px 12px;font-size:14px;margin-bottom:8px;color:#111827;">
+      <div id="search-results"></div>
     </div>
   </div>
 
@@ -244,7 +218,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="fbar" id="child-fbar"></div>
     <div class="child-list" id="child-list"></div>
   </div>
-
   <div id="staff-pane" class="reg-pane" style="display:none;">
     <div class="summary s4">
       <div class="sp"><div class="sn" id="stin">0</div><div class="sl2">In school</div></div>
@@ -254,7 +227,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     </div>
     <div class="child-list" id="staff-list"></div>
   </div>
-
   <div id="nanny-pane" class="reg-pane" style="display:none;">
     <div class="summary s3">
       <div class="sp"><div class="sn" id="nnin">0</div><div class="sl2">On site</div></div>
@@ -263,13 +235,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     </div>
     <div class="child-list" id="nanny-list"></div>
   </div>
-
   <div id="log-pane" style="display:none;">
     <div id="loglist" style="padding:10px 16px 90px;display:flex;flex-direction:column;gap:7px;">
       <div class="empty">No events yet</div>
     </div>
   </div>
-
   <div class="bottom-btns">
     <button class="edit-btn" onclick="goEdit()">Edit</button>
     <button class="exp-btn" onclick="doExport()">Export CSV</button>
@@ -292,10 +262,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <button class="obtn sout" onclick="manMark('signed-out')">Left school</button>
       </div>
       <div id="panel-onsite-section" style="display:none;">
-        <div class="psect" style="margin-top:10px;">On-site departure</div>
+        <div class="psect" style="margin-top:10px;">On-site</div>
         <div class="obtns">
           <button class="obtn leaving-home" onclick="manMark('leaving-home')">🏠 Gone home<br><small>on site</small></button>
-          <button class="obtn onsite" onclick="manMark('onsite')">🏫 Back on site<br><small>returned</small></button>
+          <button class="obtn onsite" onclick="manMark('onsite')">🏫 Back on site</button>
         </div>
       </div>
     </div>
@@ -306,9 +276,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <button class="obtn out" onclick="manMark('out')">Left school</button>
       </div>
       <div id="panel-staff-onsite" style="display:none;">
-        <div class="psect" style="margin-top:10px;">On-site home</div>
+        <div class="psect" style="margin-top:10px;">On-site</div>
         <div class="obtns">
-          <button class="obtn leaving-home" onclick="manMark('leaving-home')">🏠 Gone home<br><small>on site</small></button>
+          <button class="obtn leaving-home" onclick="manMark('leaving-home')">🏠 Gone home</button>
           <button class="obtn onsite" onclick="manMark('onsite')">🏫 Back on site</button>
         </div>
       </div>
@@ -317,7 +287,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 </div>
 
-<!-- No external scanner library needed -->
 <script>
 // ── SERVICE WORKER ─────────────────────────────────────
 if('serviceWorker' in navigator){
@@ -329,50 +298,29 @@ if('serviceWorker' in navigator){
 // ── PWA INSTALL ────────────────────────────────────────
 var deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',function(e){
-  e.preventDefault();deferredPrompt=e;
-  document.getElementById('install-banner').style.display='flex';
+  e.preventDefault();
+  deferredPrompt=e;
+  showToast('Tip: tap ⋮ menu → Add to Home Screen to install','ok');
 });
-function doInstall(){
-  if(!deferredPrompt)return;
-  deferredPrompt.prompt();
-  deferredPrompt.userChoice.then(function(){
-    deferredPrompt=null;
-    document.getElementById('install-banner').style.display='none';
-  });
-}
 
-// ── URL SCAN HANDLER — reads ?scan= params when opened via QR ──
-(function(){
-  var params=new URLSearchParams(window.location.search);
-  var scanId=params.get('scan');
-  var scanN=params.get('n');
-  var scanC=params.get('c');
-  if(scanId||scanN){
-    // Store pending scan — will be processed after people are loaded
-    window._pendingScan={id:scanId,n:scanN?decodeURIComponent(scanN.replace(/\+/g,' ')):'',c:scanC?decodeURIComponent(scanC.replace(/\+/g,' ')):''}; 
-    // Clean URL so it doesn't re-trigger on refresh
-    window.history.replaceState({},'',window.location.pathname);
-  }
-})();
+// ── CHECK FOR URL SCAN PARAMS ──────────────────────────
+var urlParams=new URLSearchParams(window.location.search);
+var pendingScan=urlParams.get('scan')?{
+  id:urlParams.get('scan'),
+  n:(urlParams.get('n')||'').replace(/\+/g,' '),
+  c:(urlParams.get('c')||'').replace(/\+/g,' ')
+}:null;
+if(pendingScan) window.history.replaceState({},'',window.location.pathname);
 
 // ── CONFIG ─────────────────────────────────────────────
-var CHILD_CLASSES={
-  mm:{name:'Mini Martlets',color:'#7c3aed'},
-  pn:{name:'Pre-Nursery',color:'#d97706'},
-  nu:{name:'Nursery',color:'#1d4ed8'},
-  rc:{name:'Reception',color:'#1a6b4a'}
-};
+var CLASSES={mm:{name:'Mini Martlets',color:'#7c3aed'},pn:{name:'Pre-Nursery',color:'#d97706'},nu:{name:'Nursery',color:'#1d4ed8'},rc:{name:'Reception',color:'#1a6b4a'}};
 var CUTOFF=8*60+15;
-var STORAGE_KEY='preprep_register_v3';
-// Migrate from any older key
-(function(){
-  var keys=['preprep_register_v4','preprep_register_v2','preprep_register_v1'];
-  keys.forEach(function(k){
-    if(!localStorage.getItem(STORAGE_KEY)&&localStorage.getItem(k)){
-      localStorage.setItem(STORAGE_KEY,localStorage.getItem(k));
-    }
-  });
-})();
+var STORE_KEY='preprep_v3';
+var MODE_COLORS={in:'#1a6b4a',out:'#1d4ed8','leaving-home':'#ea580c',onsite:'#7c3aed'};
+var MODE_BG={in:'#e8f5f0',out:'#dbeafe','leaving-home':'#fff7ed',onsite:'#f5f3ff'};
+var MODE_LABELS={in:'Sign in mode',out:'Left school mode','leaving-home':'Home on site mode',onsite:'Back on site mode'};
+var SL={present:'Present',late:'Late',absent:'Absent','signed-out':'Left school','leaving-home':'Home on site',onsite:'Back on site',in:'In school',out:'Left school'};
+var SV={present:'signed in',late:'signed in (late)',absent:'marked absent','signed-out':'left school','leaving-home':'gone home (on site)',onsite:'returned to school',in:'signed in',out:'left school'};
 
 // ── STATE ──────────────────────────────────────────────
 var people=[];
@@ -383,60 +331,8 @@ var childFilter='All';
 var panelId=null;
 var currentTab='scan';
 
-var SL={present:'Present',late:'Late',absent:'Absent','signed-out':'Left school','leaving-home':'Home on site',onsite:'Back on site',in:'In school',out:'Left school'};
-var SV={present:'signed in',late:'signed in (late)',absent:'marked absent','signed-out':'left school','leaving-home':'gone home (on site)',onsite:'returned to school grounds',in:'signed in',out:'left school'};
-var MODE_COLORS={'in':'#1a6b4a','out':'#1d4ed8','leaving-home':'#ea580c','onsite':'#7c3aed'};
-var MODE_LABELS={'in':'Sign in mode','out':'Left school mode','leaving-home':'Home on site mode','onsite':'Back on site mode'};
-var MODE_BG={'in':'#e8f5f0','out':'#dbeafe','leaving-home':'#fff7ed','onsite':'#f5f3ff'};
-var MODE_BORDER={'in':'#1a6b4a','out':'#1d4ed8','leaving-home':'#ea580c','onsite':'#7c3aed'};
-
-// ── CLOCK ──────────────────────────────────────────────
-function pad(n){return('0'+n).slice(-2);}
-function nowStr(){var d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());}
-function minNow(){var d=new Date();return d.getHours()*60+d.getMinutes();}
-function tickClock(){
-  var d=new Date(),s=pad(d.getHours())+':'+pad(d.getMinutes());
-  ['clk0','clk1'].forEach(function(id){var e=document.getElementById(id);if(e)e.textContent=s;});
-  var md=document.getElementById('main-date');
-  if(md)md.textContent=d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
-}
-tickClock();setInterval(tickClock,10000);
-
-// ── LOCAL STORAGE ──────────────────────────────────────
-function saveToDevice(list){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(list));return true;}catch(e){return false;}}
-function loadFromDevice(){try{var s=localStorage.getItem(STORAGE_KEY);return s?JSON.parse(s):null;}catch(e){return null;}}
-
-// ── SETUP ROWS ─────────────────────────────────────────
-function addRow(container,type){appendRowToContainer(container,type,'',false,'');refreshCount(container);}
-function appendRowToContainer(container,type,name,onsite,family){
-  var c=document.getElementById('rows-'+container);
-  var d=document.createElement('div');d.className='name-row';
-  var extra='';
-  if(type==='nanny'){extra='<input type="text" placeholder="Family name (optional)" value="'+family+'" style="width:90px;flex:0 0 90px;" oninput="refreshCount(\''+container+'\')" />';}
-  d.innerHTML='<input type="text" placeholder="Full name" value="'+name+'" oninput="refreshCount(\''+container+'\')" />'+extra+
-    '<div class="onsite-toggle"><input type="checkbox" '+(onsite?'checked':'')+' title="Lives on site" /><span class="onsite-lbl">On<br>site</span></div>'+
-    '<button class="del-btn" onclick="this.parentNode.remove();refreshCount(\''+container+'\');">×</button>';
-  c.appendChild(d);
-}
-function refreshCount(container){
-  var rows=document.querySelectorAll('#rows-'+container+' .name-row');
-  var n=0;
-  [].forEach.call(rows,function(row){var inp=row.querySelector('input[type=text]');if(inp&&inp.value.trim())n++;});
-  var el=document.getElementById('cnt-'+container);if(el)el.textContent=n;
-  checkStart();
-}
-function checkStart(){
-  var any=false;
-  [].forEach.call(document.querySelectorAll('.name-rows .name-row'),function(row){
-    var inp=row.querySelector('input[type=text]');if(inp&&inp.value.trim())any=true;
-  });
-  var btn=document.getElementById('start-btn');
-  btn.disabled=!any;
-  btn.textContent=any?'Start Register →':'Add at least one person to start';
-}
-
-// ── HARDCODED PEOPLE — always available on any device ────
-var HARDCODED_PEOPLE=[
+// ── HARDCODED PEOPLE ───────────────────────────────────
+var PEOPLE=[
   {name:"Ottilie Daubney",cls:"mm",type:"child",onsite:false,family:""},
   {name:"Joseph Desruelle",cls:"mm",type:"child",onsite:false,family:""},
   {name:"Etta Dunn",cls:"mm",type:"child",onsite:false,family:""},
@@ -510,52 +406,84 @@ var HARDCODED_PEOPLE=[
   {name:"Antonela",cls:"nanny",type:"nanny",onsite:false,family:"Desruelle"}
 ];
 
-(function(){
-  var list=loadFromDevice()||HARDCODED_PEOPLE;
+// ── CLOCK ──────────────────────────────────────────────
+function pad(n){return('0'+n).slice(-2);}
+function nowStr(){var d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());}
+function minNow(){var d=new Date();return d.getHours()*60+d.getMinutes();}
+function tickClock(){
+  var d=new Date(),s=pad(d.getHours())+':'+pad(d.getMinutes());
+  ['clk0','clk1'].forEach(function(id){var e=document.getElementById(id);if(e)e.textContent=s;});
+  var md=document.getElementById('main-date');
+  if(md)md.textContent=d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+}
+tickClock();setInterval(tickClock,10000);
+
+// ── SETUP ROWS ─────────────────────────────────────────
+function addRow(container,type){appendRow(container,type,'',false,'');refreshCount(container);}
+function appendRow(container,type,name,onsite,family){
+  var c=document.getElementById('rows-'+container);
+  var d=document.createElement('div');d.className='name-row';
+  var extra=type==='nanny'?'<input type="text" placeholder="Family name" value="'+family+'" style="width:90px;flex:0 0 90px;" oninput="refreshCount(\''+container+'\')" />':'';
+  d.innerHTML='<input type="text" placeholder="Full name" value="'+name+'" oninput="refreshCount(\''+container+'\')" />'+extra+
+    '<div class="onsite-toggle"><input type="checkbox" '+(onsite?'checked':'')+' /><span class="onsite-lbl">On<br>site</span></div>'+
+    '<button class="del-btn" onclick="this.parentNode.remove();refreshCount(\''+container+'\');">×</button>';
+  c.appendChild(d);
+}
+function refreshCount(k){
+  var n=0;
+  [].forEach.call(document.querySelectorAll('#rows-'+k+' .name-row'),function(r){
+    var i=r.querySelector('input[type=text]');if(i&&i.value.trim())n++;
+  });
+  var el=document.getElementById('cnt-'+k);if(el)el.textContent=n;
+  checkStart();
+}
+function checkStart(){
+  var any=false;
+  [].forEach.call(document.querySelectorAll('.name-rows .name-row'),function(r){
+    var i=r.querySelector('input[type=text]');if(i&&i.value.trim())any=true;
+  });
+  var btn=document.getElementById('start-btn');
+  btn.disabled=!any;
+  btn.textContent=any?'Start Register →':'Add at least one person to start';
+}
+
+// ── LOAD PEOPLE ────────────────────────────────────────
+function loadPeople(){
+  var saved=null;
+  try{var s=localStorage.getItem(STORE_KEY);if(s)saved=JSON.parse(s);}catch(e){}
+  var list=saved&&saved.length?saved:PEOPLE;
   ['mm','pn','nu','rc','staff','nanny'].forEach(function(k){document.getElementById('rows-'+k).innerHTML='';});
   list.forEach(function(p){
-    appendRowToContainer(p.type==='child'?p.cls:p.type,p.type,p.name,p.onsite,p.family);
+    appendRow(p.type==='child'?p.cls:p.type,p.type,p.name,p.onsite,p.family||'');
     refreshCount(p.type==='child'?p.cls:p.type);
   });
-  var notice=document.getElementById('saved-notice');
-  notice.textContent='✓ '+list.length+' people loaded — tap Start Register';
-  notice.style.display='block';
-  document.getElementById('first-time-notice').style.display='none';
-  document.getElementById('intro-text').textContent='All names loaded. Tap Start Register to begin, or edit first.';
-})();
+  document.getElementById('saved-notice').textContent='✓ '+list.length+' people loaded — tap Start Register';
+}
+loadPeople();
 
 // ── GO LIVE ────────────────────────────────────────────
 function goLive(){
   people=[];records={};
   var idx=0;
-  function processGroup(container,type,clsKey){
+  function proc(container,type,cls){
     [].forEach.call(document.querySelectorAll('#rows-'+container+' .name-row'),function(row){
       var inputs=row.querySelectorAll('input[type=text]');
       var name=inputs[0]?inputs[0].value.trim():'';if(!name)return;
       var family=inputs[1]?inputs[1].value.trim():'';
-      var chk=row.querySelector('input[type=checkbox]');
-      var onsite=chk?chk.checked:false;
-      var id=(type==='child'?clsKey:type).toUpperCase()+pad(++idx);
-      people.push({id:id,name:name,cls:clsKey,type:type,onsite:onsite,family:family});
+      var onsite=row.querySelector('input[type=checkbox]').checked;
+      var id=(type==='child'?cls:type).toUpperCase()+pad(++idx);
+      people.push({id:id,name:name,cls:cls,type:type,onsite:onsite,family:family});
       records[id]={status:type==='child'?'absent':'out',time:null};
     });
   }
-  ['mm','pn','nu','rc'].forEach(function(k){processGroup(k,'child',k);});
-  processGroup('staff','staff','staff');
-  processGroup('nanny','nanny','nanny');
+  ['mm','pn','nu','rc'].forEach(function(k){proc(k,'child',k);});
+  proc('staff','staff','staff');proc('nanny','nanny','nanny');
   if(!people.length)return;
-  saveToDevice(people.map(function(p){return{name:p.name,cls:p.cls,type:p.type,onsite:p.onsite,family:p.family};}));
-  setTimeout(function(){
-    document.getElementById('setup-screen').className='screen';
-    document.getElementById('main-screen').className='screen active';
-    renderAll();
-    // Process any pending QR scan from URL
-    if(window._pendingScan){
-      var ps=window._pendingScan;
-      window._pendingScan=null;
-      setTimeout(function(){handleScan(ps.id,ps);},300);
-    }
-  },400);
+  try{localStorage.setItem(STORE_KEY,JSON.stringify(people.map(function(p){return{name:p.name,cls:p.cls,type:p.type,onsite:p.onsite,family:p.family};})));}catch(e){}
+  document.getElementById('setup-screen').className='screen';
+  document.getElementById('main-screen').className='screen active';
+  renderAll();
+  if(pendingScan){setTimeout(function(){handleScan(pendingScan.id,pendingScan);pendingScan=null;},300);}
 }
 
 function goEdit(){
@@ -563,37 +491,15 @@ function goEdit(){
   people.forEach(function(p){records[p.id]={status:p.type==='child'?'absent':'out',time:null};});
   document.getElementById('main-screen').className='screen';
   document.getElementById('setup-screen').className='screen active';
-  ['mm','pn','nu','rc','staff','nanny'].forEach(function(k){document.getElementById('rows-'+k).innerHTML='';});
-  people.forEach(function(p){
-    var container=p.type==='child'?p.cls:p.type;
-    appendRowToContainer(container,p.type,p.name,p.onsite,p.family);
-    refreshCount(container);
-  });
-  checkStart();
+  loadPeople();
 }
-
-// ── HANDLE INCOMING URL SCANS WHEN APP ALREADY OPEN ──────
-window.addEventListener('pageshow', function(){
-  var params=new URLSearchParams(window.location.search);
-  var scanId=params.get('scan');
-  var scanN=params.get('n');
-  var scanC=params.get('c');
-  if((scanId||scanN)&&people.length){
-    var n=scanN?decodeURIComponent(scanN.replace(/\+/g,' ')):'';
-    var c=scanC?decodeURIComponent(scanC.replace(/\+/g,' ')):'';
-    window.history.replaceState({},'',window.location.pathname);
-    handleScan(scanId,{id:scanId,n:n,c:c});
-  }
-});
 
 // ── TABS ───────────────────────────────────────────────
 function showTab(t){
   currentTab=t;
   ['scan','child','staff','nanny','log'].forEach(function(x){
-    var pane=document.getElementById(x+'-pane');
-    if(pane)pane.style.display=x===t?'':'none';
-    var tab=document.getElementById('tab-'+x);
-    if(tab)tab.className='tab'+(x===t?' on':'');
+    var p=document.getElementById(x+'-pane');if(p)p.style.display=x===t?'':'none';
+    var tb=document.getElementById('tab-'+x);if(tb)tb.className='tab'+(x===t?' on':'');
   });
   if(t==='child')renderChildren();
   if(t==='staff')renderAdults('staff');
@@ -605,135 +511,80 @@ function showTab(t){
 function setMode(m,btn){
   scanMode=m;
   document.querySelectorAll('.mode-btn').forEach(function(b){b.className='mode-btn';});
-  var cls='mode-btn on';
-  if(m==='leaving-home')cls='mode-btn on-home';
-  if(m==='onsite')cls='mode-btn on-site';
-  if(m==='out')cls='mode-btn on-out';
-  btn.className=cls;
+  btn.className='mode-btn on'+(m==='leaving-home'?'-home':m==='onsite'?'-site':m==='out'?'-out':'');
   var box=document.getElementById('mode-box');
   box.style.background=MODE_BG[m]||'#e8f5f0';
-  box.style.borderColor=MODE_BORDER[m]||'#1a6b4a';
+  box.style.borderColor=MODE_COLORS[m]||'#1a6b4a';
   document.getElementById('mode-label').style.color=MODE_COLORS[m]||'#1a6b4a';
   document.getElementById('mode-label').textContent=MODE_LABELS[m]||m;
-  // Reset file input so same card can be scanned again
   document.getElementById('qr-input').value='';
   document.getElementById('scan-result').style.display='none';
 }
 
-// ── NATIVE QR SCAN — uses browser BarcodeDetector API ──
-function processQRImage(input){
+// ── PHOTO SCAN ─────────────────────────────────────────
+function processPhoto(input){
   if(!input.files||!input.files[0])return;
-  var file=input.files[0];
   var img=new Image();
-  var url=URL.createObjectURL(file);
+  var url=URL.createObjectURL(input.files[0]);
   img.onload=function(){
     if('BarcodeDetector' in window){
-      // Use native browser BarcodeDetector — works on Android Chrome 83+
-      var detector=new BarcodeDetector({formats:['qr_code']});
-      detector.detect(img).then(function(barcodes){
+      new BarcodeDetector({formats:['qr_code']}).detect(img).then(function(codes){
         URL.revokeObjectURL(url);
-        if(barcodes&&barcodes.length>0){
-          handleQRText(barcodes[0].rawValue);
-        } else {
-          // Try canvas approach as fallback
-          tryCanvasDecode(img);
-        }
-      }).catch(function(){
-        tryCanvasDecode(img);
-      });
+        if(codes&&codes.length)handleQRText(codes[0].rawValue);
+        else showResult('Could not read QR code — try the name search below','#dc2626','#fee2e2');
+      }).catch(function(){showResult('Could not read QR code — try the name search below','#dc2626','#fee2e2');});
     } else {
-      tryCanvasDecode(img);
+      showResult('QR scanning not supported — use the name search below','#d97706','#fef3c7');
     }
     setTimeout(function(){input.value='';},500);
   };
   img.src=url;
 }
 
-function tryCanvasDecode(img){
-  // Use BarcodeDetector on canvas element — sometimes works when image doesn't
-  var canvas=document.createElement('canvas');
-  canvas.width=img.naturalWidth||img.width;
-  canvas.height=img.naturalHeight||img.height;
-  var ctx=canvas.getContext('2d');
-  ctx.drawImage(img,0,0);
-  if('BarcodeDetector' in window){
-    var detector=new BarcodeDetector({formats:['qr_code']});
-    detector.detect(canvas).then(function(barcodes){
-      if(barcodes&&barcodes.length>0){
-        handleQRText(barcodes[0].rawValue);
-      } else {
-        showManualEntry();
-      }
-    }).catch(function(){
-      showManualEntry();
-    });
-  } else {
-    showManualEntry();
-  }
-}
-
-function showManualEntry(){
-  document.getElementById('manual-entry-box').style.display='block';
-  document.getElementById('manual-input').focus();
-  showScanResult('Auto-read failed — use manual entry below','#d97706','#fef3c7');
-}
-
 function handleQRText(text){
-  // Strip whitespace including tabs
-  var raw=text.replace(/^[\s\t\n\r]+|[\s\t\n\r]+$/g,'');
-  // Add missing curly braces
+  var raw=text.trim();
   if(raw.charAt(0)!=='{')raw='{'+raw;
   if(raw.charAt(raw.length-1)!=='}')raw=raw+'}';
-  try{
-    var d=JSON.parse(raw);
-    if(d.id){handleScan(d.id,d);return;}
-  }catch(e){}
-  // Regex fallback
+  try{var d=JSON.parse(raw);if(d.id){handleScan(d.id,d);return;}}catch(e){}
   var mid=text.match(/"id"\s*:\s*"([^"]+)"/);
   var mn=text.match(/"n"\s*:\s*"([^"]+)"/);
   var mc=text.match(/"c"\s*:\s*"([^"]+)"/);
   if(mid){handleScan(mid[1],{id:mid[1],n:mn?mn[1]:'',c:mc?mc[1]:''});return;}
-  showScanResult('Card not recognised — check name matches','#d97706','#fef3c7');
+  showResult('Card not recognised','#d97706','#fef3c7');
 }
 
-function showScanResult(msg,color,bg){
+function showResult(msg,color,bg){
   var el=document.getElementById('scan-result');
-  el.textContent=msg;
-  el.style.color=color;
-  el.style.background=bg;
-  el.style.border='1.5px solid '+color;
-  el.style.display='block';
+  el.textContent=msg;el.style.color=color;el.style.background=bg;
+  el.style.border='1.5px solid '+color;el.style.display='block';
   setTimeout(function(){el.style.display='none';},3000);
 }
 
-// ── MANUAL SEARCH ─────────────────────────────────────
-function manualSearch(query){
-  var res=document.getElementById('manual-results');
-  if(!query||query.length<2){res.innerHTML='';return;}
-  var q=query.toLowerCase();
-  var matches=people.filter(function(p){return p.name.toLowerCase().indexOf(q)>-1;});
-  if(!matches.length){res.innerHTML='<div style="font-size:12px;color:#9ca3af;padding:8px;">No matches</div>';return;}
-  res.innerHTML=matches.slice(0,5).map(function(p){
+// ── NAME SEARCH ────────────────────────────────────────
+function doSearch(q){
+  var res=document.getElementById('search-results');
+  if(!q||q.length<2){res.innerHTML='';return;}
+  var matches=people.filter(function(p){return p.name.toLowerCase().indexOf(q.toLowerCase())>-1;});
+  if(!matches.length){res.innerHTML='<div style="font-size:12px;color:#9ca3af;padding:6px;">No matches</div>';return;}
+  res.innerHTML=matches.slice(0,6).map(function(p){
     var r=records[p.id];
-    var clsName=p.type==='child'&&CHILD_CLASSES[p.cls]?CHILD_CLASSES[p.cls].name:p.type;
-    return'<div onclick="manualMarkBySearch(''+p.id+'')" style="padding:10px 12px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;cursor:pointer;">'+
-      '<div style="font-size:13px;font-weight:700;">'+p.name+'</div>'+
-      '<div style="font-size:11px;color:#6b7280;">'+clsName+' · '+(SL[r.status]||r.status)+'</div>'+
-    '</div>';
+    var cls=p.type==='child'&&CLASSES[p.cls]?CLASSES[p.cls].name:p.type;
+    return'<div onclick="searchMark(\''+p.id+'\')" style="padding:10px 12px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;cursor:pointer;margin-bottom:5px;">'+
+      '<div style="font-size:13px;font-weight:700;color:#111827;">'+p.name+'</div>'+
+      '<div style="font-size:11px;color:#6b7280;">'+cls+' · '+(SL[r.status]||r.status)+'</div></div>';
   }).join('');
 }
 
-function manualMarkBySearch(id){
-  document.getElementById('manual-input').value='';
-  document.getElementById('manual-results').innerHTML='';
-  document.getElementById('manual-entry-box').style.display='none';
+function searchMark(id){
+  document.getElementById('search-input').value='';
+  document.getElementById('search-results').innerHTML='';
   var p=people.find(function(x){return x.id===id;});if(!p)return;
   var status;
   if(scanMode==='in')status=p.type==='child'?(minNow()>CUTOFF?'late':'present'):'in';
   else if(scanMode==='out')status=p.type==='child'?'signed-out':'out';
   else status=scanMode;
   mark(p.id,status,true);
-  showScanResult('✓ '+p.name+' — '+(SV[status]||status),MODE_COLORS[scanMode]||'#1a6b4a',MODE_BG[scanMode]||'#e8f5f0');
+  showResult('✓ '+p.name+' — '+(SV[status]||status),MODE_COLORS[scanMode]||'#1a6b4a',MODE_BG[scanMode]||'#e8f5f0');
 }
 
 // ── HANDLE SCAN ────────────────────────────────────────
@@ -743,25 +594,17 @@ function handleScan(id,qrData){
   cool[id]=Date.now();
   var p=people.find(function(x){return x.id===id;});
   if(!p&&qrData&&qrData.n){
-    var qn=(qrData.n||'').trim().toLowerCase();
+    var qn=qrData.n.trim().toLowerCase();
     p=people.find(function(x){return x.name.toLowerCase()===qn;});
     if(p)cool[p.id]=Date.now();
   }
-  if(!p&&qrData&&qrData.c){
-    var CLASS_NAME_MAP={'mini martlets':'mm','pre-nursery':'pn','prenursery':'pn','nursery':'nu','reception':'rc','staff':'staff','nanny':'nanny'};
-    var clsKey=CLASS_NAME_MAP[(qrData.c||'').trim().toLowerCase()]||qrData.c;
-    var qn2=(qrData.n||'').trim().toLowerCase();
-    p=people.find(function(x){return x.cls===clsKey&&x.name.toLowerCase().indexOf(qn2)>-1;});
-    if(p)cool[p.id]=Date.now();
-  }
-  if(!p){showScanResult('Card not in register — check name matches','#d97706','#fef3c7');showToast('Card not recognised','warn');return;}
+  if(!p){showResult('Card not in register','#d97706','#fef3c7');showToast('Not recognised','warn');return;}
   var status;
   if(scanMode==='in')status=p.type==='child'?(minNow()>CUTOFF?'late':'present'):'in';
   else if(scanMode==='out')status=p.type==='child'?'signed-out':'out';
   else status=scanMode;
   mark(p.id,status,true);
-  var typeLabel=p.type==='nanny'?'Nanny ':p.type==='staff'?'Staff ':'';
-  showScanResult('✓ '+typeLabel+p.name+' — '+(SV[status]||status),MODE_COLORS[scanMode]||'#1a6b4a',MODE_BG[scanMode]||'#e8f5f0');
+  showResult('✓ '+p.name+' — '+(SV[status]||status),MODE_COLORS[scanMode]||'#1a6b4a',MODE_BG[scanMode]||'#e8f5f0');
 }
 
 // ── MARK ───────────────────────────────────────────────
@@ -770,13 +613,7 @@ function mark(id,status,fromScan){
   var t=nowStr();
   records[id].status=status;records[id].time=t;
   eventLog.unshift({name:p.name,cls:p.cls,type:p.type,status:status,time:t,verb:SV[status]||status,onsite:p.onsite,family:p.family});
-  if(fromScan){
-    var tt='ok';
-    if(status==='absent')tt='warn';
-    if(status==='leaving-home')tt='home';
-    if(status==='onsite')tt='site';
-    showToast(p.name+' — '+(SV[status]||status),tt);
-  }
+  if(fromScan){var tt=status==='absent'?'warn':status==='leaving-home'?'home':status==='onsite'?'site':'ok';showToast(p.name+' — '+(SV[status]||status),tt);}
   renderAll();
 }
 
@@ -789,44 +626,50 @@ function renderAll(){
 }
 function renderChildren(){
   var fbar=document.getElementById('child-fbar');
-  fbar.innerHTML=['All'].concat(Object.keys(CHILD_CLASSES).map(function(k){return CHILD_CLASSES[k].name;})).map(function(n){
-    return'<div class="fp'+(childFilter===n?' on':'')+'" onclick="setChildFilter(\''+n+'\')">'+n+'</div>';
+  fbar.innerHTML=['All'].concat(Object.keys(CLASSES).map(function(k){return CLASSES[k].name;})).map(function(n){
+    return'<div class="fp'+(childFilter===n?' on':'')+'" onclick="setFilter(\''+n+'\')">'+n+'</div>';
   }).join('');
   var shown=childFilter==='All'?people.filter(function(p){return p.type==='child';}):
-    people.filter(function(p){return p.type==='child'&&CHILD_CLASSES[p.cls]&&CHILD_CLASSES[p.cls].name===childFilter;});
+    people.filter(function(p){return p.type==='child'&&CLASSES[p.cls]&&CLASSES[p.cls].name===childFilter;});
   document.getElementById('cp').textContent=shown.filter(function(p){return records[p.id].status==='present';}).length;
   document.getElementById('cl').textContent=shown.filter(function(p){return records[p.id].status==='late';}).length;
   document.getElementById('ca').textContent=shown.filter(function(p){return records[p.id].status==='absent';}).length;
   document.getElementById('ch').textContent=shown.filter(function(p){return records[p.id].status==='leaving-home';}).length;
   document.getElementById('ct').textContent=shown.length;
-  var ord={absent:0,late:1,'signed-out':2,'leaving-home':3,onsite:4,present:5};
-  shown.sort(function(a,b){return(ord[records[a.id].status]||0)-(ord[records[b.id].status]||0);});
-  document.getElementById('child-list').innerHTML=shown.map(personCard).join('');
+  shown.sort(function(a,b){return({'absent':0,'late':1,'signed-out':2,'leaving-home':3,'onsite':4,'present':5}[records[a.id].status]||0)-({'absent':0,'late':1,'signed-out':2,'leaving-home':3,'onsite':4,'present':5}[records[b.id].status]||0);});
+  document.getElementById('child-list').innerHTML=shown.map(card).join('');
 }
-function setChildFilter(f){childFilter=f;renderChildren();}
+function setFilter(f){childFilter=f;renderChildren();}
 function renderAdults(type){
   var list=people.filter(function(p){return p.type===type;});
-  var inEl=document.getElementById(type==='staff'?'stin':'nnin');
-  var outEl=document.getElementById(type==='staff'?'stout':'nnout');
-  var totEl=document.getElementById(type==='staff'?'sttot':'nntot');
-  if(inEl)inEl.textContent=list.filter(function(p){return records[p.id].status==='in';}).length;
-  if(outEl)outEl.textContent=list.filter(function(p){return records[p.id].status==='out';}).length;
-  if(totEl)totEl.textContent=list.length;
-  if(type==='staff'){var h=document.getElementById('sthome');if(h)h.textContent=list.filter(function(p){return records[p.id].status==='leaving-home';}).length;}
+  document.getElementById(type==='staff'?'stin':'nnin').textContent=list.filter(function(p){return records[p.id].status==='in';}).length;
+  document.getElementById(type==='staff'?'stout':'nnout').textContent=list.filter(function(p){return records[p.id].status==='out';}).length;
+  document.getElementById(type==='staff'?'sttot':'nntot').textContent=list.length;
+  if(type==='staff')document.getElementById('sthome').textContent=list.filter(function(p){return records[p.id].status==='leaving-home';}).length;
   list.sort(function(a,b){return({'out':0,'leaving-home':1,'onsite':2,'in':3}[records[a.id].status]||0)-({'out':0,'leaving-home':1,'onsite':2,'in':3}[records[b.id].status]||0);});
-  document.getElementById(type+'-list').innerHTML=list.map(personCard).join('');
+  document.getElementById(type+'-list').innerHTML=list.map(card).join('');
 }
-function personCard(p){
+function card(p){
   var r=records[p.id];
   var ini=p.name.split(' ').map(function(x){return x[0];}).join('').slice(0,2).toUpperCase();
-  var status=r.status;
-  var sub=p.type==='child'?(CHILD_CLASSES[p.cls]?CHILD_CLASSES[p.cls].name:'')+(r.time?' · '+r.time:''):
+  var sub=p.type==='child'?(CLASSES[p.cls]?CLASSES[p.cls].name:'')+(r.time?' · '+r.time:''):
     p.type==='nanny'?'Nanny'+(p.family?' — '+p.family+' family':'')+(r.time?' · '+r.time:''):
     'Staff'+(r.time?' · '+r.time:'');
   return'<div class="cc" onclick="openPanel(\''+p.id+'\')">'+
-    '<div class="av '+status+'">'+ini+'</div>'+
+    '<div class="av '+r.status+'">'+ini+'</div>'+
     '<div class="ci"><div class="cn">'+p.name+(p.onsite?'<span class="onsite-pip"></span>':'')+'</div><div class="cs">'+sub+'</div></div>'+
-    '<span class="stag '+status+'">'+(SL[status]||status)+'</span></div>';
+    '<span class="stag '+r.status+'">'+(SL[r.status]||r.status)+'</span></div>';
+}
+function renderLog(){
+  var el=document.getElementById('loglist');
+  if(!eventLog.length){el.innerHTML='<div class="empty">No events yet</div>';return;}
+  el.innerHTML=eventLog.map(function(e){
+    return'<div class="le"><div class="ldot '+e.status+'"></div>'+
+      '<div class="lt"><strong>'+e.name+'</strong>'+(e.type!=='child'?' ('+e.type+')':'')+' '+e.verb+
+      (e.family?' <span style="color:#9ca3af">('+e.family+')</span>':'')+
+      '<br><span style="font-size:10px;color:#9ca3af">'+(e.type==='child'&&CLASSES[e.cls]?CLASSES[e.cls].name:e.type)+'</span></div>'+
+      '<div class="ltime">'+e.time+'</div></div>';
+  }).join('');
 }
 
 // ── PANEL ──────────────────────────────────────────────
@@ -834,8 +677,8 @@ function openPanel(id){
   panelId=id;
   var p=people.find(function(x){return x.id===id;});if(!p)return;
   var r=records[id];
-  document.getElementById('pname').textContent=p.name+(p.onsite?' 🏠':'')+(p.type==='nanny'?' (Nanny)':p.type==='staff'?' (Staff)':'');
-  document.getElementById('psub').textContent=(p.type==='child'&&CHILD_CLASSES[p.cls]?CHILD_CLASSES[p.cls].name:p.type)+' · '+(SL[r.status]||r.status);
+  document.getElementById('pname').textContent=p.name+(p.onsite?' 🏠':'')+(p.type!=='child'?' ('+p.type+')':'');
+  document.getElementById('psub').textContent=(p.type==='child'&&CLASSES[p.cls]?CLASSES[p.cls].name:p.type)+' · '+(SL[r.status]||r.status);
   var isChild=p.type==='child';
   document.getElementById('panel-child-btns').style.display=isChild?'block':'none';
   document.getElementById('panel-adult-btns').style.display=isChild?'none':'block';
@@ -846,27 +689,13 @@ function openPanel(id){
 function closePanel(){document.getElementById('panel').className='overlay';panelId=null;}
 function manMark(s){if(!panelId)return;mark(panelId,s,false);showToast('Updated','ok');closePanel();}
 
-// ── LOG ────────────────────────────────────────────────
-function renderLog(){
-  var el=document.getElementById('loglist');
-  if(!eventLog.length){el.innerHTML='<div class="empty">No events yet</div>';return;}
-  el.innerHTML=eventLog.map(function(e){
-    return'<div class="le"><div class="ldot '+e.status+'"></div>'+
-      '<div class="lt"><strong>'+e.name+'</strong>'+(e.type==='nanny'?' (Nanny)':e.type==='staff'?' (Staff)':'')+' '+e.verb+
-      (e.family?' <span style="color:#9ca3af">('+e.family+' family)</span>':'')+
-      '<br><span style="font-size:10px;color:#9ca3af">'+(e.type==='child'&&CHILD_CLASSES[e.cls]?CHILD_CLASSES[e.cls].name:e.type)+'</span></div>'+
-      '<div class="ltime">'+e.time+'</div></div>';
-  }).join('');
-}
-
 // ── EXPORT ─────────────────────────────────────────────
 function doExport(){
   var today=new Date().toISOString().slice(0,10);
-  var csv='ID,Name,Type,Class/Role,Family,OnSite,Status,Time\n';
+  var csv='ID,Name,Type,Class,Family,OnSite,Status,Time\n';
   people.forEach(function(p){
     var r=records[p.id];
-    var clsName=p.type==='child'&&CHILD_CLASSES[p.cls]?CHILD_CLASSES[p.cls].name:p.type;
-    csv+=p.id+',"'+p.name+'",'+p.type+',"'+clsName+'",'+(p.family||'')+','+(p.onsite?'yes':'no')+','+(r.status||'')+(r.time?','+r.time:',')+'\n';
+    csv+=p.id+',"'+p.name+'",'+p.type+','+(CLASSES[p.cls]?CLASSES[p.cls].name:p.type)+','+(p.family||'')+','+(p.onsite?'yes':'no')+','+(r.status||'')+(r.time?','+r.time:',')+'\n';
   });
   var a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
