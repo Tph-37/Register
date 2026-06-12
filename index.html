@@ -304,13 +304,18 @@ window.addEventListener('beforeinstallprompt',function(e){
 });
 
 // ── CHECK FOR URL SCAN PARAMS ──────────────────────────
-var urlParams=new URLSearchParams(window.location.search);
-var pendingScan=urlParams.get('scan')?{
-  id:urlParams.get('scan'),
-  n:(urlParams.get('n')||'').replace(/\+/g,' '),
-  c:(urlParams.get('c')||'').replace(/\+/g,' ')
-}:null;
-if(pendingScan) window.history.replaceState({},'',window.location.pathname);
+function getUrlScan(){
+  var p=new URLSearchParams(window.location.search);
+  if(!p.get('scan')&&!p.get('n'))return null;
+  var scan={
+    id:p.get('scan')||'',
+    n:(p.get('n')||'').replace(/\+/g,' '),
+    c:(p.get('c')||'').replace(/\+/g,' ')
+  };
+  window.history.replaceState({},'',window.location.pathname);
+  return scan;
+}
+var pendingScan=getUrlScan();
 
 // ── CONFIG ─────────────────────────────────────────────
 var CLASSES={mm:{name:'Mini Martlets',color:'#7c3aed'},pn:{name:'Pre-Nursery',color:'#d97706'},nu:{name:'Nursery',color:'#1d4ed8'},rc:{name:'Reception',color:'#1a6b4a'}};
@@ -483,7 +488,13 @@ function goLive(){
   document.getElementById('setup-screen').className='screen';
   document.getElementById('main-screen').className='screen active';
   renderAll();
-  if(pendingScan){setTimeout(function(){handleScan(pendingScan.id,pendingScan);pendingScan=null;},300);}
+  if(pendingScan){
+    var ps=pendingScan;pendingScan=null;
+    setTimeout(function(){
+      showTab('scan');
+      handleScan(ps.id,ps);
+    },400);
+  }
 }
 
 function goEdit(){
