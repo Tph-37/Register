@@ -466,7 +466,7 @@ setInterval(updateSessionDisplay,60000);
   if(p.get('scan')||p.get('n')){
     // Use saved mode (set by teacher in app) NOT the hardcoded mode in QR URL
     var savedMode='in';
-    try{savedMode=sessionStorage.getItem('preprep_mode')||'in';}catch(e){}
+    try{savedMode=localStorage.getItem('preprep_mode')||'in';}catch(e){}
     var scan={
       id:p.get('scan')||'',
       n:(p.get('n')||'').replace(/\+/g,' '),
@@ -487,7 +487,7 @@ function getPendingScan(){
 }
 // Restore saved mode from previous session
 try{
-  var savedMode=sessionStorage.getItem('preprep_mode');
+  var savedMode=localStorage.getItem('preprep_mode');
   if(savedMode)scanMode=savedMode;
 }catch(e){}
 var pendingScan=getPendingScan();
@@ -691,9 +691,26 @@ function goLiveFromSaved(savedList){
   loadAttendance();
   document.getElementById('setup-screen').className='screen';
   document.getElementById('main-screen').className='screen active';
+  // Restore saved mode and update UI
+  try{
+    var m=localStorage.getItem('preprep_mode')||'in';
+    scanMode=m;
+    applyMode(m);
+    // Update mode buttons
+    document.querySelectorAll('.mode-btn').forEach(function(b){b.className='mode-btn';});
+    var btnMap={in:0,out:1,'leaving-home':2,onsite:3};
+    var btns=document.querySelectorAll('.mode-btn');
+    var btnIdx=btnMap[m];
+    if(btns[btnIdx]){
+      var cls='mode-btn on';
+      if(m==='leaving-home')cls='mode-btn on-home';
+      else if(m==='onsite')cls='mode-btn on-site';
+      else if(m==='out')cls='mode-btn on-out';
+      btns[btnIdx].className=cls;
+    }
+  }catch(e){}
   showTab('scan');
   renderAll();
-  // Now process pending scan
   pendingScan=getPendingScan()||pendingScan;
   processPendingScan();
   checkAutoReset();
@@ -829,7 +846,7 @@ function showTab(t){
 function setMode(m,btn){
   scanMode=m;
   // Save mode so QR scans use it even after app reloads via URL
-  try{sessionStorage.setItem('preprep_mode',m);}catch(e){}
+  try{localStorage.setItem('preprep_mode',m);}catch(e){}
   document.querySelectorAll('.mode-btn').forEach(function(b){b.className='mode-btn';});
   var cls='mode-btn on';
   if(m==='leaving-home')cls='mode-btn on-home';
