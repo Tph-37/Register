@@ -474,28 +474,30 @@ if(pendingScan&&pendingScan.mode){
   scanMode=pendingScan.mode;
 }
 
+function applyMode(m){
+  if(!m||m===scanMode)return;
+  scanMode=m;
+  var modeLabels={in:'Sign in mode',out:'Left school mode','leaving-home':'Home on site mode',onsite:'Back on site mode'};
+  var modeBg={in:'#e8f5f0',out:'#dbeafe','leaving-home':'#fff7ed',onsite:'#f5f3ff'};
+  var modeColors={in:'#1a6b4a',out:'#1d4ed8','leaving-home':'#ea580c',onsite:'#7c3aed'};
+  var box=document.getElementById('mode-box');
+  if(box){box.style.background=modeBg[m]||'#e8f5f0';box.style.borderColor=modeColors[m]||'#1a6b4a';}
+  var lbl=document.getElementById('mode-label');
+  if(lbl){lbl.textContent=modeLabels[m]||m;lbl.style.color=modeColors[m]||'#1a6b4a';}
+}
+
 function processPendingScan(){
-  if(pendingScan&&people.length){
-    var ps=pendingScan;pendingScan=null;
-    setTimeout(function(){
-      // Apply mode from URL
-      if(ps.mode&&ps.mode!==scanMode){
-        scanMode=ps.mode;
-        // Update mode box UI
-        var modeLabels={in:'Sign in mode',out:'Left school mode','leaving-home':'Home on site mode',onsite:'Back on site mode'};
-        var modeBg={in:'#e8f5f0',out:'#dbeafe','leaving-home':'#fff7ed',onsite:'#f5f3ff'};
-        var modeColors={in:'#1a6b4a',out:'#1d4ed8','leaving-home':'#ea580c',onsite:'#7c3aed'};
-        var box=document.getElementById('mode-box');
-        if(box){box.style.background=modeBg[ps.mode]||'#e8f5f0';box.style.borderColor=modeColors[ps.mode]||'#1a6b4a';}
-        var lbl=document.getElementById('mode-label');
-        if(lbl){lbl.textContent=modeLabels[ps.mode]||ps.mode;lbl.style.color=modeColors[ps.mode]||'#1a6b4a';}
-        // Update mode buttons
-        document.querySelectorAll('.mode-btn').forEach(function(b){b.className='mode-btn';});
-      }
-      showTab('scan');
-      handleScan(ps.id,ps);
-    },400);
+  if(!pendingScan)return;
+  if(!people.length){
+    // People not loaded yet - retry
+    setTimeout(processPendingScan,200);
+    return;
   }
+  var ps=pendingScan;pendingScan=null;
+  applyMode(ps.mode);
+  showTab('scan');
+  // Small delay to let UI settle
+  setTimeout(function(){handleScan(ps.id,ps);},200);
 }
 
 // ── CONFIG ─────────────────────────────────────────────
@@ -812,28 +814,82 @@ function handleCapturedPhoto(input){
   var img=new Image();
   var url=URL.createObjectURL(file);
   img.onload=function(){
-    URL.revokeObjectURL(url);
     if('BarcodeDetector' in window){
-      var detector=new BarcodeDetector({formats:['qr_code']});
+      // Try on image element first
+      var detector=new BarcodeDetector({formats:['qr_code','unknown']});
       detector.detect(img).then(function(codes){
+        URL.revokeObjectURL(url);
         if(codes&&codes.length){
           handleQRText(codes[0].rawValue);
         } else {
-          showResult('No QR code found — try again, ensure good lighting','#d97706','#fef3c7');
+          // Try on canvas with enhanced contrast
+          tryCanvasDetect(img);
         }
-      }).catch(function(){
-        showResult('Could not read photo — try again','#dc2626','#fee2e2');
+      }).catch(function(e){
+        URL.revokeObjectURL(url);
+        tryCanvasDetect(img);
       });
     } else {
-      showResult('QR detection not supported — use name search below','#d97706','#fef3c7');
+      URL.revokeObjectURL(url);
+      // BarcodeDetector not available - show helpful message
+      showResult('Auto-scan not available on this browser. Use name search below or scan with Google Lens.','#d97706','#fef3c7');
     }
-    // Reset so same card can be scanned again
     setTimeout(function(){input.value='';},500);
   };
   img.onerror=function(){
+    URL.revokeObjectURL(url);
     showResult('Could not load photo — try again','#dc2626','#fee2e2');
   };
   img.src=url;
+}
+
+function tryCanvasDetect(img){
+  // Draw to canvas and try again - sometimes works when image element fails
+  var canvas=document.createElement('canvas');
+  // Scale down large images for better detection
+  var maxSize=1024;
+  var scale=Math.min(1,maxSize/Math.max(img.naturalWidth||img.width,img.naturalHeight||img.height));
+  canvas.width=(img.naturalWidth||img.width)*scale;
+  canvas.height=(img.naturalHeight||img.height)*scale;
+  var ctx=canvas.getContext('2d');
+  ctx.drawImage(img,0,0,canvas.width,canvas.height);
+  if('BarcodeDetector' in window){
+    var detector=new BarcodeDetector({formats:['qr_code','unknown']});
+    detector.detect(canvas).then(function(codes){
+      if(codes&&codes.length){
+        handleQRText(codes[0].rawValue);
+      } else {
+        // Try with higher contrast
+        tryHighContrastDetect(canvas,ctx);
+      }
+    }).catch(function(){
+      showResult('Could not read QR code — try the name search below','#d97706','#fef3c7');
+    });
+  } else {
+    showResult('Use name search below or scan with Google Lens','#d97706','#fef3c7');
+  }
+}
+
+function tryHighContrastDetect(canvas,ctx){
+  // Convert to high contrast black and white
+  var imageData=ctx.getImageData(0,0,canvas.width,canvas.height);
+  var data=imageData.data;
+  for(var i=0;i<data.length;i+=4){
+    var avg=(data[i]+data[i+1]+data[i+2])/3;
+    var val=avg<128?0:255;
+    data[i]=val;data[i+1]=val;data[i+2]=val;
+  }
+  ctx.putImageData(imageData,0,0);
+  var detector=new BarcodeDetector({formats:['qr_code','unknown']});
+  detector.detect(canvas).then(function(codes){
+    if(codes&&codes.length){
+      handleQRText(codes[0].rawValue);
+    } else {
+      showResult('Could not read QR code — ensure card is flat, well-lit, and fills the frame','#d97706','#fef3c7');
+    }
+  }).catch(function(){
+    showResult('Could not read QR code — try name search below','#d97706','#fef3c7');
+  });
 }
 
 // ── HANDLE SCAN FROM URL ───────────────────────────────
@@ -888,13 +944,37 @@ var cool={};
 function handleScan(id,qrData){
   if(cool[id]&&Date.now()-cool[id]<3000)return;
   cool[id]=Date.now();
+  // Try exact ID match first
   var p=people.find(function(x){return x.id===id;});
+  // Try name exact match
   if(!p&&qrData&&qrData.n){
     var qn=qrData.n.trim().toLowerCase();
     p=people.find(function(x){return x.name.toLowerCase()===qn;});
     if(p)cool[p.id]=Date.now();
   }
-  if(!p){showResult('Card not in register','#d97706','#fef3c7');showToast('Not recognised','warn');return;}
+  // Try partial name match (first + last name)
+  if(!p&&qrData&&qrData.n){
+    var qn2=qrData.n.trim().toLowerCase();
+    p=people.find(function(x){return x.name.toLowerCase().indexOf(qn2)>-1||qn2.indexOf(x.name.toLowerCase())>-1;});
+    if(p)cool[p.id]=Date.now();
+  }
+  // Try matching just surname
+  if(!p&&qrData&&qrData.n){
+    var parts=(qrData.n||'').trim().split('+').join(' ').split(' ');
+    var surname=parts[parts.length-1].toLowerCase();
+    if(surname.length>2){
+      p=people.find(function(x){
+        var xparts=x.name.toLowerCase().split(' ');
+        return xparts[xparts.length-1]===surname;
+      });
+      if(p)cool[p.id]=Date.now();
+    }
+  }
+  if(!p){
+    showResult('Card not recognised — ID:'+id+' Name:'+(qrData&&qrData.n?qrData.n:'?'),'#d97706','#fef3c7');
+    showToast('Not recognised','warn');
+    return;
+  }
   var status;
   if(scanMode==='in')status=p.type==='child'?(minNow()>CUTOFF?'late':'present'):'in';
   else if(scanMode==='out')status=p.type==='child'?'signed-out':'out';
