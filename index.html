@@ -257,12 +257,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="mode-box" id="mode-box">
       <div style="font-size:36px;margin-bottom:8px;">📷</div>
       <div id="mode-label" style="font-size:16px;font-weight:700;color:#1a6b4a;">Sign in mode</div>
-      <div style="font-size:12px;color:#6b7280;margin-top:4px;">Select mode then scan a QR card</div>
+      <div style="font-size:12px;color:#6b7280;margin-top:4px;">Select mode above then scan</div>
     </div>
-    <a id="scan-link" href="googlelens://" style="width:100%;max-width:340px;text-decoration:none;">
-      <button class="scan-btn">📷 Open Google Lens to Scan</button>
-    </a>
-    <p class="scan-note">Tap to open Google Lens. Point at a QR card — it opens the register and marks the person automatically.</p>
+    <input type="file" id="qr-capture" accept="image/*" capture="environment" style="display:none;" onchange="handleCapturedPhoto(this)">
+    <button class="scan-btn" onclick="openCamera()">&#128247; Scan QR Card</button>
+    <p class="scan-note">Tap <strong>Scan QR Card</strong> — your camera opens. Point at the QR code and take a photo. The person is marked automatically in the current mode.</p>
     <div class="scan-result" id="scan-result"></div>
     <!-- Staff manual search — protected -->
     <div style="width:100%;max-width:340px;background:#fff;border:1.5px solid #e5e7eb;border-radius:12px;padding:14px;">
@@ -372,8 +371,8 @@ if('serviceWorker' in navigator){
 }
 
 // ── PIN / SESSION ──────────────────────────────────────
-var CORRECT_PIN='1234'; // Change this to your preferred PIN
-var SESSION_HOURS=10;   // Hours before PIN required again
+var CORRECT_PIN='1927'; // Change this to your preferred PIN
+var SESSION_HOURS=2;   // Hours before PIN required again
 var pinEntry='';
 var sessionKey='preprep_session';
 
@@ -459,16 +458,43 @@ setInterval(updateSessionDisplay,60000);
 function getUrlScan(){
   var p=new URLSearchParams(window.location.search);
   if(!p.get('scan')&&!p.get('n'))return null;
-  var scan={id:p.get('scan')||'',n:(p.get('n')||'').replace(/\+/g,' '),c:(p.get('c')||'').replace(/\+/g,' ')};
+  var scan={
+    id:p.get('scan')||'',
+    n:(p.get('n')||'').replace(/\+/g,' '),
+    c:(p.get('c')||'').replace(/\+/g,' '),
+    mode:p.get('mode')||'in'
+  };
   window.history.replaceState({},'',window.location.pathname);
   return scan;
 }
 var pendingScan=getUrlScan();
 
+// If URL had a mode param, apply it immediately
+if(pendingScan&&pendingScan.mode){
+  scanMode=pendingScan.mode;
+}
+
 function processPendingScan(){
   if(pendingScan&&people.length){
     var ps=pendingScan;pendingScan=null;
-    setTimeout(function(){showTab('scan');handleScan(ps.id,ps);},400);
+    setTimeout(function(){
+      // Apply mode from URL
+      if(ps.mode&&ps.mode!==scanMode){
+        scanMode=ps.mode;
+        // Update mode box UI
+        var modeLabels={in:'Sign in mode',out:'Left school mode','leaving-home':'Home on site mode',onsite:'Back on site mode'};
+        var modeBg={in:'#e8f5f0',out:'#dbeafe','leaving-home':'#fff7ed',onsite:'#f5f3ff'};
+        var modeColors={in:'#1a6b4a',out:'#1d4ed8','leaving-home':'#ea580c',onsite:'#7c3aed'};
+        var box=document.getElementById('mode-box');
+        if(box){box.style.background=modeBg[ps.mode]||'#e8f5f0';box.style.borderColor=modeColors[ps.mode]||'#1a6b4a';}
+        var lbl=document.getElementById('mode-label');
+        if(lbl){lbl.textContent=modeLabels[ps.mode]||ps.mode;lbl.style.color=modeColors[ps.mode]||'#1a6b4a';}
+        // Update mode buttons
+        document.querySelectorAll('.mode-btn').forEach(function(b){b.className='mode-btn';});
+      }
+      showTab('scan');
+      handleScan(ps.id,ps);
+    },400);
   }
 }
 
@@ -772,7 +798,43 @@ function setMode(m,btn){
   document.getElementById('scan-result').style.display='none';
 }
 
-// Scan handled via direct Google Lens link
+// ── CAMERA & QR PROCESSING ────────────────────────────
+function openCamera(){
+  // Reset input so same card can be scanned twice
+  var inp=document.getElementById('qr-capture');
+  inp.value='';
+  inp.click();
+}
+
+function handleCapturedPhoto(input){
+  if(!input.files||!input.files[0])return;
+  var file=input.files[0];
+  var img=new Image();
+  var url=URL.createObjectURL(file);
+  img.onload=function(){
+    URL.revokeObjectURL(url);
+    if('BarcodeDetector' in window){
+      var detector=new BarcodeDetector({formats:['qr_code']});
+      detector.detect(img).then(function(codes){
+        if(codes&&codes.length){
+          handleQRText(codes[0].rawValue);
+        } else {
+          showResult('No QR code found — try again, ensure good lighting','#d97706','#fef3c7');
+        }
+      }).catch(function(){
+        showResult('Could not read photo — try again','#dc2626','#fee2e2');
+      });
+    } else {
+      showResult('QR detection not supported — use name search below','#d97706','#fef3c7');
+    }
+    // Reset so same card can be scanned again
+    setTimeout(function(){input.value='';},500);
+  };
+  img.onerror=function(){
+    showResult('Could not load photo — try again','#dc2626','#fee2e2');
+  };
+  img.src=url;
+}
 
 // ── HANDLE SCAN FROM URL ───────────────────────────────
 function handleQRText(text){
