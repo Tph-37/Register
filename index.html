@@ -372,8 +372,8 @@ if('serviceWorker' in navigator){
 }
 
 // ── PIN / SESSION ──────────────────────────────────────
-var CORRECT_PIN='1927'; // Change this to your preferred PIN
-var SESSION_HOURS=2;   // Hours before PIN required again
+var CORRECT_PIN='1234'; // Change this to your preferred PIN
+var SESSION_HOURS=10;   // Hours before PIN required again
 var pinEntry='';
 var sessionKey='preprep_session';
 
@@ -706,17 +706,24 @@ function checkAutoReset(){
 function showResetPrompt(){
   var div=document.createElement('div');
   div.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;';
-  div.innerHTML='<div style="background:#fff;border-radius:16px;padding:24px;max-width:320px;width:100%;text-align:center;">'+
-    '<div style="font-size:32px;margin-bottom:12px;">🌙</div>'+
+  var inner=document.createElement('div');
+  inner.style.cssText='background:#fff;border-radius:16px;padding:24px;max-width:320px;width:100%;text-align:center;';
+  inner.innerHTML='<div style="font-size:32px;margin-bottom:12px;">\u{1F319}</div>'+
     '<div style="font-size:17px;font-weight:700;margin-bottom:8px;">End of Day</div>'+
-    '<div style="font-size:13px;color:#6b7280;margin-bottom:20px;line-height:1.5;">It's after 6pm. Download today's register before it resets for tomorrow.</div>'+
-    '<button onclick="doExport();setTimeout(function(){doReset();},1000);" style="width:100%;padding:14px;background:#1a6b4a;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;">Download CSV &amp; Reset</button>'+
-    '<button onclick="doReset();" style="width:100%;padding:14px;background:#f3f4f6;color:#6b7280;border:none;border-radius:10px;font-size:13px;cursor:pointer;">Reset without downloading</button>'+
-    '</div>';
+    '<div style="font-size:13px;color:#6b7280;margin-bottom:20px;line-height:1.5;">It is after 6pm. Download the register before it resets for tomorrow.</div>';
+  var btn1=document.createElement('button');
+  btn1.textContent='Download CSV & Reset';
+  btn1.style.cssText='width:100%;padding:14px;background:#1a6b4a;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;';
+  btn1.onclick=function(){doExport();setTimeout(doReset,1000);};
+  var btn2=document.createElement('button');
+  btn2.textContent='Reset without downloading';
+  btn2.style.cssText='width:100%;padding:14px;background:#f3f4f6;color:#6b7280;border:none;border-radius:10px;font-size:13px;cursor:pointer;';
+  btn2.onclick=doReset;
+  inner.appendChild(btn1);inner.appendChild(btn2);
+  div.appendChild(inner);
   document.body.appendChild(div);
   window._resetDiv=div;
 }
-
 function doReset(){
   if(window._resetDiv){document.body.removeChild(window._resetDiv);window._resetDiv=null;}
   clearAttendance();
