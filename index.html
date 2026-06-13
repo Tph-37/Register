@@ -464,11 +464,14 @@ setInterval(updateSessionDisplay,60000);
 (function(){
   var p=new URLSearchParams(window.location.search);
   if(p.get('scan')||p.get('n')){
+    // Use saved mode (set by teacher in app) NOT the hardcoded mode in QR URL
+    var savedMode='in';
+    try{savedMode=sessionStorage.getItem('preprep_mode')||'in';}catch(e){}
     var scan={
       id:p.get('scan')||'',
       n:(p.get('n')||'').replace(/\+/g,' '),
       c:(p.get('c')||'').replace(/\+/g,' '),
-      mode:p.get('mode')||'in'
+      mode:savedMode
     };
     try{sessionStorage.setItem('preprep_pending_scan',JSON.stringify(scan));}catch(e){}
     window.history.replaceState({},'',window.location.pathname);
@@ -482,6 +485,11 @@ function getPendingScan(){
   }catch(e){}
   return null;
 }
+// Restore saved mode from previous session
+try{
+  var savedMode=sessionStorage.getItem('preprep_mode');
+  if(savedMode)scanMode=savedMode;
+}catch(e){}
 var pendingScan=getPendingScan();
 if(pendingScan&&pendingScan.mode){scanMode=pendingScan.mode;}
 
@@ -820,6 +828,8 @@ function showTab(t){
 // ── SCAN MODE ──────────────────────────────────────────
 function setMode(m,btn){
   scanMode=m;
+  // Save mode so QR scans use it even after app reloads via URL
+  try{sessionStorage.setItem('preprep_mode',m);}catch(e){}
   document.querySelectorAll('.mode-btn').forEach(function(b){b.className='mode-btn';});
   var cls='mode-btn on';
   if(m==='leaving-home')cls='mode-btn on-home';
