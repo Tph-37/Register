@@ -371,8 +371,8 @@ if('serviceWorker' in navigator){
 }
 
 // ── PIN / SESSION ──────────────────────────────────────
-var CORRECT_PIN='1927'; // Change this to your preferred PIN
-var SESSION_HOURS=2;   // Hours before PIN required again
+var CORRECT_PIN='1234'; // Change this to your preferred PIN
+var SESSION_HOURS=10;   // Hours before PIN required again
 var pinEntry='';
 var sessionKey='preprep_session';
 
@@ -398,8 +398,13 @@ function startSession(){
     }));
   }catch(e){}
   document.getElementById('lock-screen').classList.add('hidden');
-  var h=SESSION_HOURS;
-  showToast('Unlocked — session valid for '+h+' hours','ok');
+  showToast('Unlocked — session valid for '+SESSION_HOURS+' hours','ok');
+  // Load register and process any pending scan from QR
+  var savedPeople=null;
+  try{var sp=localStorage.getItem(STORE_KEY);if(sp)savedPeople=JSON.parse(sp);}catch(e){}
+  if(savedPeople&&savedPeople.length){
+    goLiveFromSaved(savedPeople);
+  }
 }
 
 function lockApp(){
@@ -455,24 +460,30 @@ function updateSessionDisplay(){
 setInterval(updateSessionDisplay,60000);
 
 // ── URL SCAN PARAMS ────────────────────────────────────
-function getUrlScan(){
+// Store scan in sessionStorage so it survives PIN entry
+(function(){
   var p=new URLSearchParams(window.location.search);
-  if(!p.get('scan')&&!p.get('n'))return null;
-  var scan={
-    id:p.get('scan')||'',
-    n:(p.get('n')||'').replace(/\+/g,' '),
-    c:(p.get('c')||'').replace(/\+/g,' '),
-    mode:p.get('mode')||'in'
-  };
-  window.history.replaceState({},'',window.location.pathname);
-  return scan;
-}
-var pendingScan=getUrlScan();
+  if(p.get('scan')||p.get('n')){
+    var scan={
+      id:p.get('scan')||'',
+      n:(p.get('n')||'').replace(/\+/g,' '),
+      c:(p.get('c')||'').replace(/\+/g,' '),
+      mode:p.get('mode')||'in'
+    };
+    try{sessionStorage.setItem('preprep_pending_scan',JSON.stringify(scan));}catch(e){}
+    window.history.replaceState({},'',window.location.pathname);
+  }
+})();
 
-// If URL had a mode param, apply it immediately
-if(pendingScan&&pendingScan.mode){
-  scanMode=pendingScan.mode;
+function getPendingScan(){
+  try{
+    var s=sessionStorage.getItem('preprep_pending_scan');
+    if(s){sessionStorage.removeItem('preprep_pending_scan');return JSON.parse(s);}
+  }catch(e){}
+  return null;
 }
+var pendingScan=getPendingScan();
+if(pendingScan&&pendingScan.mode){scanMode=pendingScan.mode;}
 
 function applyMode(m){
   if(!m||m===scanMode)return;
@@ -487,17 +498,19 @@ function applyMode(m){
 }
 
 function processPendingScan(){
+  // Check sessionStorage in case it was stored before PIN
+  if(!pendingScan){
+    pendingScan=getPendingScan();
+  }
   if(!pendingScan)return;
   if(!people.length){
-    // People not loaded yet - retry
-    setTimeout(processPendingScan,200);
+    setTimeout(processPendingScan,300);
     return;
   }
   var ps=pendingScan;pendingScan=null;
-  applyMode(ps.mode);
+  applyMode(ps.mode||'in');
   showTab('scan');
-  // Small delay to let UI settle
-  setTimeout(function(){handleScan(ps.id,ps);},200);
+  setTimeout(function(){handleScan(ps.id,ps);},300);
 }
 
 // ── CONFIG ─────────────────────────────────────────────
@@ -644,19 +657,40 @@ function loadPeople(){
 }
 loadPeople();
 
-// Check session on load — if valid session AND people saved, go straight to register
+// Check session on load — if valid session AND people saved, go straight to register  
 if(checkSession()){
   updateSessionDisplay();
-  // Auto-start if people already saved
   var savedPeople=null;
   try{var sp=localStorage.getItem(STORE_KEY);if(sp)savedPeople=JSON.parse(sp);}catch(e){}
   if(savedPeople&&savedPeople.length){
-    // Silently go live
-    setTimeout(function(){goLive();},100);
+    // Auto-start: build people directly from saved data, skip DOM
+    setTimeout(function(){goLiveFromSaved(savedPeople);},100);
   }
 }
 
 // ── GO LIVE ────────────────────────────────────────────
+function goLiveFromSaved(savedList){
+  people=[];records={};
+  var idx=0;
+  savedList.forEach(function(p){
+    var cls=p.cls||'mm';
+    var type=p.type||'child';
+    var id=(type==='child'?cls:type).toUpperCase()+pad(++idx);
+    people.push({id:id,name:p.name,cls:cls,type:type,onsite:p.onsite||false,family:p.family||''});
+    records[id]={status:type==='child'?'absent':'out',time:null};
+  });
+  if(!people.length)return;
+  loadAttendance();
+  document.getElementById('setup-screen').className='screen';
+  document.getElementById('main-screen').className='screen active';
+  showTab('scan');
+  renderAll();
+  // Now process pending scan
+  pendingScan=getPendingScan()||pendingScan;
+  processPendingScan();
+  checkAutoReset();
+}
+
 function goLive(){
   people=[];records={};
   var idx=0;
